@@ -8,6 +8,6 @@ RUN mvn clean package -DskipTests
 # Fase 2: Ejecución
 FROM openjdk:17-jdk-alpine
 WORKDIR /app
-COPY --from=build /app/target/DSWS2G4_Backend-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/DSWS2Grupo4-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
