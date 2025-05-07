@@ -1,50 +1,67 @@
 package DSWS2Grupo4.service;
 
+import DSWS2Grupo4.DTO.IncidenciaRequest;
+import DSWS2Grupo4.model.Equipo;
 import DSWS2Grupo4.model.Incidencia;
+import DSWS2Grupo4.model.UsuarioSolicitante;
+import DSWS2Grupo4.repository.EquipoRepository;
 import DSWS2Grupo4.repository.IncidenciaRepository;
+import DSWS2Grupo4.repository.UsuarioSolicitanteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class IncidenciaService {
 
-    private final IncidenciaRepository incidenciaRepository;
-
-    @Autowired
-    public IncidenciaService(IncidenciaRepository incidenciaRepository) {
-        this.incidenciaRepository = incidenciaRepository;
-    }
+    @Autowired private EquipoRepository equipoRepo;
+    @Autowired private UsuarioSolicitanteRepository usuarioRepo;
+    @Autowired private IncidenciaRepository incidenciaRepo;
 
     public List<Incidencia> listarIncidencias() {
-        return incidenciaRepository.findAll();
+        return incidenciaRepo.findAll();
     }
 
-    public Incidencia guardarIncidencia(Incidencia incidencia) {
-        return incidenciaRepository.save(incidencia);
+    @Transactional
+    public Incidencia registrarIncidencia(IncidenciaRequest req) {
+        Equipo equipo = equipoRepo.findByCodigoEquipo(req.getCodigoEquipo())
+            .orElseThrow(() -> new EntityNotFoundException("Equipo no encontrado"));
+
+        UsuarioSolicitante usuario = usuarioRepo
+            .findByCorreoNumeroAndEquipo_IdEquipo(req.getCorreoNumero(), equipo.getIdEquipo())
+            .orElseGet(() -> {
+                UsuarioSolicitante u = new UsuarioSolicitante();
+                u.setCorreoNumero(req.getCorreoNumero());
+                u.setEquipo(equipo);
+                return usuarioRepo.save(u);
+            });
+
+        Incidencia inc = new Incidencia();
+        inc.setUsuarioSolicitante(usuario);
+        inc.setDescripcion(req.getDescripcion());
+        return incidenciaRepo.save(inc);
     }
 
-    public Optional<Incidencia> obtenerIncidenciaPorId(Long id) {
-        return incidenciaRepository.findById(id);
+    public Incidencia guardarIncidencia(Incidencia inc) {
+        return incidenciaRepo.save(inc);
     }
 
-    public Incidencia actualizarIncidencia(Long id, Incidencia incidencia) {
-        if (incidenciaRepository.existsById(id)) {
-            incidencia.setId(id);
-            return incidenciaRepository.save(incidencia);
-        }
-        return null;  // O lanzar una excepción según el caso
+    public Incidencia actualizarIncidencia(Long id, Incidencia inc) {
+        if (!incidenciaRepo.existsById(id)) return null;
+        inc.setId(id);
+        return incidenciaRepo.save(inc);
     }
 
     public boolean eliminarIncidencia(Long id) {
-        if (incidenciaRepository.existsById(id)) {
-            incidenciaRepository.deleteById(id);
-            return true;
-        }
-        return false;
+        if (!incidenciaRepo.existsById(id)) return false;
+        incidenciaRepo.deleteById(id);
+        return true;
+    }
+
+    public Incidencia obtenerPorId(Long id) {
+        return incidenciaRepo.findById(id).orElse(null);
     }
 }
-
-

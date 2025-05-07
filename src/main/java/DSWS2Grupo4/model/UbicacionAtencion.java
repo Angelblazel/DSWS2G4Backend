@@ -5,6 +5,5 @@
 package DSWS2Grupo4.model;
 
 public enum UbicacionAtencion {
-    REMOTO,
-    TALLER
+    remoto, taller;
 }

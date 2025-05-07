@@ -1,8 +1,11 @@
 package DSWS2Grupo4.controller;
 
+import DSWS2Grupo4.DTO.IncidenciaRequest;
 import DSWS2Grupo4.model.Incidencia;
 import DSWS2Grupo4.service.IncidenciaService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,40 +15,51 @@ import java.util.List;
 @RequestMapping("/api/v1/incidencias")
 public class IncidenciaController {
 
-    private final IncidenciaService incidenciaService;
-
     @Autowired
-    public IncidenciaController(IncidenciaService incidenciaService) {
-        this.incidenciaService = incidenciaService;
-    }
+    private IncidenciaService incService;
 
+    // Listar todas
     @GetMapping
-    public List<Incidencia> listarIncidencias() {
-        return incidenciaService.listarIncidencias();
+    public ResponseEntity<List<Incidencia>> listar() {
+        return ResponseEntity.ok(incService.listarIncidencias());
     }
 
-    @PostMapping
-    public Incidencia crearIncidencia(@RequestBody Incidencia incidencia) {
-        return incidenciaService.guardarIncidencia(incidencia);
-    }
-
+    // Obtener por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Incidencia> obtenerIncidenciaPorId(@PathVariable Long id) {
-        return incidenciaService.obtenerIncidenciaPorId(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Incidencia> getById(@PathVariable Long id) {
+        Incidencia inc = incService.obtenerPorId(id);
+        return inc != null ? ResponseEntity.ok(inc) : ResponseEntity.notFound().build();
     }
 
+    // Crear pública (sin login)
+    @PostMapping("/publica")
+    public ResponseEntity<?> crearPublica(@RequestBody IncidenciaRequest req) {
+        try {
+            Incidencia inc = incService.registrarIncidencia(req);
+            return ResponseEntity.status(HttpStatus.CREATED).body(inc);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    // Crear (con entidad completa)
+    @PostMapping
+    public ResponseEntity<Incidencia> crear(@RequestBody Incidencia inc) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(incService.guardarIncidencia(inc));
+    }
+
+    // Actualizar
     @PutMapping("/{id}")
-    public ResponseEntity<Incidencia> actualizarIncidencia(@PathVariable Long id, @RequestBody Incidencia incidencia) {
-        Incidencia updatedIncidencia = incidenciaService.actualizarIncidencia(id, incidencia);
-        return updatedIncidencia != null ? ResponseEntity.ok(updatedIncidencia) : ResponseEntity.notFound().build();
+    public ResponseEntity<Incidencia> actualizar(@PathVariable Long id, @RequestBody Incidencia inc) {
+        Incidencia updated = incService.actualizarIncidencia(id, inc);
+        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
+    // Eliminar
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarIncidencia(@PathVariable Long id) {
-        return incidenciaService.eliminarIncidencia(id) ?
-                ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        return incService.eliminarIncidencia(id)
+            ? ResponseEntity.noContent().build()
+            : ResponseEntity.notFound().build();
     }
 }
-
