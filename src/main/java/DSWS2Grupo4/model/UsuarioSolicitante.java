@@ -1,7 +1,7 @@
 package DSWS2Grupo4.model;
 
 import jakarta.persistence.*;
-
+//hola
 @Entity
 @Table (name = "usuarios_solicitantes")
 
