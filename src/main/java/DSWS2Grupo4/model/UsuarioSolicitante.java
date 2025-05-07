@@ -1,13 +1,10 @@
 package DSWS2Grupo4.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@Table(name = "usuarios_solicitantes")
-@Getter @Setter @NoArgsConstructor
+@Table (name = "usuarios_solicitantes")
+
 public class UsuarioSolicitante {
 
     @Id
@@ -21,4 +18,31 @@ public class UsuarioSolicitante {
     @ManyToOne
     @JoinColumn(name = "id_equipo", nullable = false)
     private Equipo equipo;
+
+    public UsuarioSolicitante() {}
+
+    public UsuarioSolicitante(String correoNumero, Equipo equipo) {
+        this.correoNumero = correoNumero;
+        this.equipo = equipo;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getCorreoNumero() {
+        return correoNumero;
+    }
+
+    public void setCorreoNumero(String correoNumero) {
+        this.correoNumero = correoNumero;
+    }
+
+    public Equipo getEquipo() {
+        return equipo;
+    }
+
+    public void setEquipo(Equipo equipo) {
+        this.equipo = equipo;
+    }
 }

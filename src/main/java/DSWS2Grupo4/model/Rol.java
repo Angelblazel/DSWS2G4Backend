@@ -1,19 +1,18 @@
 package DSWS2Grupo4.model;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
-@Table(name = "roles")
-@Getter @Setter @NoArgsConstructor
 public class Rol {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_rol")
-    private Long idRol;
+    private Long id;
 
-    @Column(name = "nombre_rol", unique = true, nullable = false)
-    private String nombreRol;
+    @Column(unique = true, nullable = false)
+    private String nombre;
 }
+
