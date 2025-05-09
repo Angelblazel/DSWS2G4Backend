@@ -1,5 +1,5 @@
-package DSWS2Grupo4.model;
 
+package DSWS2Grupo4.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,31 +26,22 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="empleados", uniqueConstraints={@UniqueConstraint(columnNames = {"username"})})
-public class Empleado implements UserDetails{
+@Table(name="user", uniqueConstraints={@UniqueConstraint(columnNames = {"username"})})
+
+public class User implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_empleado")
-    Integer idEmpleado;
-
-    @Column(nullable = false)
+    Integer id;
+    @Column(nullable=false)
     String nombre;
     String username;
-    @Column(name = "password_hash")
-    String password_hash;
-    
+    String passwordHash;
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private Rol role;
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
-    }
-
-    @Override
-    public String getPassword() {
-        return password_hash;
     }
 
     @Override
@@ -60,7 +51,7 @@ public class Empleado implements UserDetails{
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;    
+        return true;
     }
 
     @Override
@@ -72,4 +63,10 @@ public class Empleado implements UserDetails{
     public boolean isEnabled() {
         return true;
     }
+
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
+
 }

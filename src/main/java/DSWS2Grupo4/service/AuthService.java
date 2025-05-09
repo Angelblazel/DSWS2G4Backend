@@ -1,24 +1,37 @@
 package DSWS2Grupo4.service;
 
+import DSWS2Grupo4.DTO.AuthResponse;
+import DSWS2Grupo4.DTO.LoginRequest;
+import DSWS2Grupo4.Jwt.JwtService;
+import DSWS2Grupo4.DTO.RegisterRequest;
 import DSWS2Grupo4.model.Empleado;
+import DSWS2Grupo4.model.Rol;
 import DSWS2Grupo4.repository.EmpleadoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-
-    @Autowired
-    private EmpleadoRepository empleadoRepo;
-
-    public Optional<Empleado> login(String username, String password) {
-        return empleadoRepo.findByUsername(username)
-            .filter(emp -> emp.getPasswordHash().equals(password))
-            .filter(emp -> {
-                String rol = emp.getRol().getNombreRol().toLowerCase();
-                return rol.equals("tecnico") || rol.equals("logistica") || rol.equals("jefe");
-            });
+    private final EmpleadoRepository userRepository;
+    private final JwtService jwtService;
+    
+    public AuthResponse login(LoginRequest request){
+        return null;
+    }
+    
+    public AuthResponse register(RegisterRequest request){
+        Empleado user = Empleado.builder()
+                .username(request.getUsername())
+                .password_hash(request.getPassword_hash())
+                .nombre(request.getNombre())
+                .role(  Rol.LOGISTICA)
+                .build();
+        userRepository.save(user);          
+        return AuthResponse.builder()
+                .token(jwtService.getToken(user))
+                .build();
     }
 }

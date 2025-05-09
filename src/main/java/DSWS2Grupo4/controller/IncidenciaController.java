@@ -18,12 +18,12 @@ public class IncidenciaController {
     @Autowired
     private IncidenciaService incService;
 
-    // Listar todas
+    // Listar todas 
     @GetMapping
     public ResponseEntity<List<Incidencia>> listar() {
         return ResponseEntity.ok(incService.listarIncidencias());
     }
-
+    
     // Obtener por ID
     @GetMapping("/{id}")
     public ResponseEntity<Incidencia> getById(@PathVariable Long id) {
