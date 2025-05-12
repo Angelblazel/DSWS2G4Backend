@@ -21,6 +21,7 @@ public class Tecnico {
     @OneToOne
     @JoinColumn(nullable = false)
     private Empleado empleado;
+    public Empleado getEmpleado() {return this.empleado;}
 
 
     private int cargaMaxima = 6;

@@ -24,30 +24,31 @@ import java.util.List;
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authProvider;
-    
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .csrf(csrf ->
-                csrf
-                .disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))   
-            .authorizeHttpRequests(authRequest ->
-                authRequest
-                    .requestMatchers(HttpMethod.GET).permitAll()
-                    .requestMatchers(HttpMethod.POST).permitAll()
-                    .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                    .requestMatchers("/auth/**").permitAll()
-                    .anyRequest().authenticated()
-                    )
+                .csrf(csrf ->
+                        csrf
+                        .disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(authRequest ->
+                        authRequest
+                                .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                                .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/api/v1/tecnico/**").hasAuthority("TECNICO")
+                                .requestMatchers(HttpMethod.GET).permitAll()
+                                .requestMatchers(HttpMethod.POST).permitAll()
+                                .anyRequest().authenticated()
+                )
                 .sessionManagement(sessionManager->
-                    sessionManager
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        sessionManager
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();                      
+                .build();
     }
-    
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

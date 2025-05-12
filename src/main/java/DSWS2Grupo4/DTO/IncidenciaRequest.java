@@ -6,7 +6,9 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor
 public class IncidenciaRequest {
-    private String correoNumero;
+    private String correo;
     private String codigoEquipo;
-    private String descripcion;
+    private Long categoriaId;
+    private Long subcategoriaId;
+    private Long problemaId;
 }

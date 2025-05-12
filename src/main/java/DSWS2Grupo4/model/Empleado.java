@@ -21,26 +21,29 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 
+@Entity
+@Table(name = "empleados")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name="empleados", uniqueConstraints={@UniqueConstraint(columnNames = {"username"})})
-public class Empleado implements UserDetails{
+@Builder
+public class Empleado implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_empleado")
-    Integer idEmpleado;
+    private Integer idEmpleado;
+
+    @Column(unique = true, nullable = false)
+    private String username;
 
     @Column(nullable = false)
-    String nombre;
-    String username;
-    @Column(name = "password_hash")
-    String password_hash;
-    
+    private String password_hash;
+
+    @Column(nullable = false)
+    private String nombre;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(nullable = false)
     private Rol role;
 
     @Override
