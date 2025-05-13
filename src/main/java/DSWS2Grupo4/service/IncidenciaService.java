@@ -94,6 +94,11 @@ public class IncidenciaService {
 
     private IncidenciaTecnicoDTO convertToTecnicoDTO(Incidencia incidencia) {
         UsuarioSolicitante usuario = incidencia.getUsuarioSolicitante();
+        Integer prioridadProblema = incidencia.getProblemaSubcategoria().getPrioridadProblema();
+        Integer prioridadUsuario = usuario.getPrioridadUsuario();
+
+        int prioridadTotal = (prioridadProblema != null ? prioridadProblema : 0) +
+                (prioridadUsuario != null ? prioridadUsuario : 0);
         return new IncidenciaTecnicoDTO(
                 incidencia.getId(),
                 usuario.getCorreoNumero(),
@@ -101,9 +106,10 @@ public class IncidenciaService {
                 incidencia.getFecha(),
                 incidencia.getProblemaSubcategoria().getDescripcionProblema(),
                 incidencia.getEstado(),
-                incidencia.getProblemaSubcategoria().getPrioridadProblema()
+                prioridadTotal  // Prioridad csumada
         );
     }
+
 
     public List<Incidencia> listarIncidencias() {
         return incidenciaRepo.findAll();
