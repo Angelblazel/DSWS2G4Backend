@@ -4,27 +4,30 @@
  */
 package DSWS2Grupo4.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 
 @Entity
+@Table(name = "tecnicos")
 public class Tecnico {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_tecnico") // Cambiar a nombre correcto de columna
     private Long id;
 
     @OneToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "id_empleado", nullable = false) // Especificar nombre de columna para la relación
     private Empleado empleado;
 
-
+    @Column(name = "carga_maxima") // Especificar nombre de columna
     private int cargaMaxima = 6;
+
+    @Column(name = "carga_actual") // Especificar nombre de columna
     private int cargaActual = 0;
+
+    public Empleado getEmpleado() {
+        return this.empleado;
+    }
 }
 
 

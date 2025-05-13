@@ -1,6 +1,7 @@
 package DSWS2Grupo4.controller;
 
 import DSWS2Grupo4.DTO.IncidenciaRequest;
+import DSWS2Grupo4.DTO.IncidenciaResponse;
 import DSWS2Grupo4.model.Incidencia;
 import DSWS2Grupo4.service.IncidenciaService;
 import jakarta.persistence.EntityNotFoundException;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/incidencias")
+@CrossOrigin(origins = "*")  // Para facilitar las pruebas
 public class IncidenciaController {
 
     @Autowired
@@ -27,39 +29,60 @@ public class IncidenciaController {
     // Obtener por ID
     @GetMapping("/{id}")
     public ResponseEntity<Incidencia> getById(@PathVariable Long id) {
-        Incidencia inc = incService.obtenerPorId(id);
-        return inc != null ? ResponseEntity.ok(inc) : ResponseEntity.notFound().build();
+        try {
+            Incidencia inc = incService.obtenerPorId(id);
+            return ResponseEntity.ok(inc);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // Crear pública (sin login)
     @PostMapping("/publica")
-    public ResponseEntity<?> crearPublica(@RequestBody IncidenciaRequest req) {
+    public ResponseEntity<?> registrarIncidenciaPublica(@RequestBody IncidenciaRequest req) {
         try {
-            Incidencia inc = incService.registrarIncidencia(req);
-            return ResponseEntity.status(HttpStatus.CREATED).body(inc);
+            IncidenciaResponse response = incService.registrarIncidenciaPublica(req);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // Loguear el error completo
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la solicitud: " + e.getMessage());
         }
     }
 
     // Crear (con entidad completa)
     @PostMapping
     public ResponseEntity<Incidencia> crear(@RequestBody Incidencia inc) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(incService.guardarIncidencia(inc));
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(incService.guardarIncidencia(inc));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // Actualizar
     @PutMapping("/{id}")
     public ResponseEntity<Incidencia> actualizar(@PathVariable Long id, @RequestBody Incidencia inc) {
-        Incidencia updated = incService.actualizarIncidencia(id, inc);
-        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+        try {
+            Incidencia updated = incService.actualizarIncidencia(id, inc);
+            return ResponseEntity.ok(updated);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // Eliminar
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         return incService.eliminarIncidencia(id)
-            ? ResponseEntity.noContent().build()
-            : ResponseEntity.notFound().build();
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }

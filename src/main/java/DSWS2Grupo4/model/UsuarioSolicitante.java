@@ -15,8 +15,11 @@ public class UsuarioSolicitante {
     @Column(name = "id_usuario_solicitante")
     private Long id;
 
-    @Column(name = "correo_numero", nullable = false)
+    @Column(name = "correo", nullable = false)
     private String correoNumero;
+
+    @Column(name = "prioridad_usuario")
+    private Integer prioridadUsuario;
 
     @ManyToOne
     @JoinColumn(name = "id_equipo", nullable = false)
