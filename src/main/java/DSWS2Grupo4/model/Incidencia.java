@@ -48,4 +48,7 @@ public class Incidencia {
     public Empleado getTecnico() {
         return asignacion != null ? asignacion.getTecnico().getEmpleado() : null;
     }
+
+    @OneToOne(mappedBy = "incidencia", cascade = CascadeType.ALL)
+    private HistorialEquipo historialEquipo;
 }

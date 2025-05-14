@@ -18,4 +18,6 @@ public interface IncidenciaRepository extends JpaRepository<Incidencia, Long> {
             @Param("tecnicoId") Integer tecnicoId,
             @Param("ticket") Long ticket
     );
+
+    List<Incidencia> findByUsuarioSolicitante_CorreoNumero(String correo);
 }

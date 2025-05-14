@@ -5,29 +5,32 @@
 package DSWS2Grupo4.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @Table(name = "tecnicos")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Tecnico {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_tecnico") // Cambiar a nombre correcto de columna
+    @Column(name = "id_tecnico")
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "id_empleado", nullable = false) // Especificar nombre de columna para la relación
+    @JoinColumn(name = "id_empleado", nullable = false)
     private Empleado empleado;
 
-    @Column(name = "carga_maxima") // Especificar nombre de columna
+    @Column(name = "carga_maxima", nullable = false)
     private int cargaMaxima = 6;
 
-    @Column(name = "carga_actual") // Especificar nombre de columna
+    @Column(name = "carga_actual", nullable = false)
     private int cargaActual = 0;
 
-    public Empleado getEmpleado() {
-        return this.empleado;
-    }
 }
 
 

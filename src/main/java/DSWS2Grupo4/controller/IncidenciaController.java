@@ -1,8 +1,11 @@
 package DSWS2Grupo4.controller;
 
+import DSWS2Grupo4.DTO.AlertaRequest;
 import DSWS2Grupo4.DTO.IncidenciaRequest;
 import DSWS2Grupo4.DTO.IncidenciaResponse;
+import DSWS2Grupo4.DTO.SeguimientoIncidenciaDTO;
 import DSWS2Grupo4.model.Incidencia;
+import DSWS2Grupo4.service.AlertaIncidenciaService;
 import DSWS2Grupo4.service.IncidenciaService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,9 @@ public class IncidenciaController {
 
     @Autowired
     private IncidenciaService incService;
+
+    @Autowired
+    private AlertaIncidenciaService alertaService;
 
     // Listar todas
     @GetMapping
@@ -84,5 +90,22 @@ public class IncidenciaController {
         return incService.eliminarIncidencia(id)
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
+    }
+
+    // Seguimiento de incidencia
+    @GetMapping("/seguimiento")
+    public ResponseEntity<List<SeguimientoIncidenciaDTO>> seguimiento(@RequestParam String correo) {
+        return ResponseEntity.ok(incService.listarSeguimientoPorCorreo(correo));
+    }
+
+    // Envio de alerta
+    @PostMapping("/alerta")
+    public ResponseEntity<String> registrarAlerta(@RequestBody AlertaRequest req) {
+        try {
+            alertaService.registrarAlerta(req);
+            return ResponseEntity.ok("Alerta registrada correctamente.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
     }
 }
