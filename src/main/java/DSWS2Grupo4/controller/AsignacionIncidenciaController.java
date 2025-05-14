@@ -1,6 +1,7 @@
 package DSWS2Grupo4.controller;
 
 import DSWS2Grupo4.DTO.AsignacionRequest;
+import DSWS2Grupo4.model.Incidencia;
 import DSWS2Grupo4.model.Tecnico;
 import DSWS2Grupo4.service.AsignacionIncidenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,12 @@ public class AsignacionIncidenciaController {
 
     @Autowired
     private AsignacionIncidenciaService asignacionService;
+
+    @GetMapping("/no-asignadas")
+    public ResponseEntity<List<Incidencia>> obtenerIncidenciasNoAsignadas() {
+        List<Incidencia> noAsignadas = asignacionService.obtenerIncidenciasNoAsignadas();
+        return ResponseEntity.ok(noAsignadas);
+    }
 
     @PostMapping
     public ResponseEntity<?> asignarTecnico(@RequestBody AsignacionRequest request){

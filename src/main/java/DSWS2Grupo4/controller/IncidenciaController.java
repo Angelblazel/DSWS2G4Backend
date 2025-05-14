@@ -1,15 +1,13 @@
 package DSWS2Grupo4.controller;
 
-import DSWS2Grupo4.DTO.AlertaRequest;
-import DSWS2Grupo4.DTO.IncidenciaRequest;
-import DSWS2Grupo4.DTO.IncidenciaResponse;
-import DSWS2Grupo4.DTO.SeguimientoIncidenciaDTO;
+import DSWS2Grupo4.DTO.*;
 import DSWS2Grupo4.model.Incidencia;
 import DSWS2Grupo4.service.AlertaIncidenciaService;
 import DSWS2Grupo4.service.IncidenciaService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -108,4 +106,25 @@ public class IncidenciaController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+
+    //Buscar por ID Publico
+    @GetMapping("/publica/{id}")
+    public ResponseEntity<IncidenciaPublicaResponse> obtenerIncidenciaPublica(@PathVariable Long id) {
+        try {
+            Incidencia inc = incService.obtenerPorId(id);
+
+            IncidenciaPublicaResponse response = new IncidenciaPublicaResponse();
+            response.setId(inc.getId());
+            response.setEstado(inc.getEstado().toString());
+            response.setFechaRegistro(inc.getFecha());
+            response.setCorreoSolicitante(inc.getUsuarioSolicitante().getCorreoNumero());
+            response.setDescripcionProblema(inc.getProblemaSubcategoria().getDescripcionProblema());
+
+            return ResponseEntity.ok(response);
+
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

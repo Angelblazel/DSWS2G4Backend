@@ -25,6 +25,14 @@ public class AsignacionIncidenciaService {
     @Autowired
     private IncidenciaRepository incidenciaRepo;
 
+    //Verificacion de Incidencias sin asignar
+    public List<Incidencia> obtenerIncidenciasNoAsignadas() {
+        List<Incidencia> todas = incidenciaRepo.findAll();
+        return todas.stream()
+                .filter(inc -> !asignacionRepo.existsByIncidenciaId(inc.getId()))
+                .toList();
+    }
+
     //Asigna un técnico a una incidencia validando carga y estado
     public void asignarTecnico(Long idIncidencia, Long idTecnico) {
         // Validar si ya fue asignada
