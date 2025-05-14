@@ -3,11 +3,9 @@ package DSWS2Grupo4.service;
 import DSWS2Grupo4.DTO.IncidenciaRequest;
 import DSWS2Grupo4.DTO.IncidenciaResponse;
 import DSWS2Grupo4.DTO.IncidenciaTecnicoDTO;
+import DSWS2Grupo4.DTO.SeguimientoIncidenciaDTO;
 import DSWS2Grupo4.model.*;
-import DSWS2Grupo4.repository.EquipoRepository;
-import DSWS2Grupo4.repository.IncidenciaRepository;
-import DSWS2Grupo4.repository.ProblemaSubcategoriaRepository;
-import DSWS2Grupo4.repository.UsuarioSolicitanteRepository;
+import DSWS2Grupo4.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +22,8 @@ public class IncidenciaService {
     @Autowired private UsuarioSolicitanteRepository usuarioRepo;
     @Autowired private EquipoRepository equipoRepo;
     @Autowired private ProblemaSubcategoriaRepository problemaRepo;
+    @Autowired private AsignacionIncidenciaRepository asignacionRepo;
+    @Autowired private HistorialEquipoRepository historialEquipoRepo;
 
     public IncidenciaResponse registrarIncidenciaPublica(IncidenciaRequest req) {
         // Validar equipo
@@ -149,5 +149,31 @@ public class IncidenciaService {
             return true;
         }
         return false;
+    }
+
+    //Consultar Estado Incidencia
+    public List<SeguimientoIncidenciaDTO> listarSeguimientoPorCorreo(String correo) {
+        List<Incidencia> incidencias = incidenciaRepo.findByUsuarioSolicitante_CorreoNumero(correo);
+
+        return incidencias.stream().map(incidencia -> {
+            SeguimientoIncidenciaDTO dto = new SeguimientoIncidenciaDTO();
+            dto.setIdIncidencia(incidencia.getId());
+            dto.setEstado(incidencia.getEstado().name());
+            dto.setModalidadAtencion(incidencia.getUbicacionAtencion().name());
+            dto.setFechaRegistro(incidencia.getFecha().toString());
+            dto.setProblema(incidencia.getProblemaSubcategoria().getDescripcionProblema());
+
+            // técnico asignado (si existe)
+            asignacionRepo.findByIncidencia(incidencia).ifPresent(asig ->
+                    dto.setTecnicoAsignado(asig.getTecnico().getEmpleado().getNombre())
+            );
+
+            // historial de solución (si existe)
+            if (incidencia.getHistorialEquipo() != null) {
+                dto.setHistorialSolucion(incidencia.getHistorialEquipo().getSolucion().getSolucionProblema());
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

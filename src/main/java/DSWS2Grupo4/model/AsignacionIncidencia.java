@@ -25,6 +25,6 @@ public class AsignacionIncidencia {
     @JoinColumn(name = "id_tecnico")
     private Tecnico tecnico;
 
-    @Column(name = "fecha_asignacion")
-    private LocalDateTime fechaAsignacion;
+    @Column(name = "fecha_asignacion", nullable = false, updatable = false)
+    private LocalDateTime fechaAsignacion = LocalDateTime.now();
 }
