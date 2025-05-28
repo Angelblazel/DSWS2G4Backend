@@ -4,9 +4,11 @@ import DSWS2Grupo4.DTO.IncidenciaRequest;
 import DSWS2Grupo4.DTO.IncidenciaResponse;
 import DSWS2Grupo4.DTO.IncidenciaTecnicoDTO;
 import DSWS2Grupo4.DTO.SeguimientoIncidenciaDTO;
+import DSWS2Grupo4.DTO.SolucionRequest;
 import DSWS2Grupo4.model.*;
 import DSWS2Grupo4.repository.*;
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,8 @@ public class IncidenciaService {
     @Autowired private ProblemaSubcategoriaRepository problemaRepo;
     @Autowired private AsignacionIncidenciaRepository asignacionRepo;
     @Autowired private HistorialEquipoRepository historialEquipoRepo;
+    @Autowired private SolucionSubcategoriaRepository solucionRepo;
+
 
     public IncidenciaResponse registrarIncidenciaPublica(IncidenciaRequest req) {
         // Validar equipo
@@ -109,8 +113,6 @@ public class IncidenciaService {
                 prioridadTotal  // Prioridad csumada
         );
     }
-
-
     public List<Incidencia> listarIncidencias() {
         return incidenciaRepo.findAll();
     }
@@ -176,4 +178,58 @@ public class IncidenciaService {
             return dto;
         }).collect(Collectors.toList());
     }
+    
+    // Obtener todas las soluciones para el problema de una incidencia dada
+    public List<SolucionSubcategoria> obtenerSolucionesPorIncidencia(Long idIncidencia) {
+        Incidencia incidencia = incidenciaRepo.findById(idIncidencia)
+                .orElseThrow(() -> new EntityNotFoundException("Incidencia no encontrada"));
+
+        Long idProblema = incidencia.getProblemaSubcategoria().getId();
+
+        return solucionRepo.findByProblema_Id(idProblema);
+    }
+    
+    // Guardar o actualizar la solución para una incidencia con palabras clave y fecha automática
+    public HistorialEquipo registrarSolucion(SolucionRequest request) {
+        // Buscar la incidencia
+        Incidencia incidencia = incidenciaRepo.findById(request.getIdIncidencia())
+                .orElseThrow(() -> new EntityNotFoundException("Incidencia no encontrada"));
+
+        // Buscar la solución
+        SolucionSubcategoria solucion = solucionRepo.findById(request.getIdSolucion())
+                .orElseThrow(() -> new EntityNotFoundException("Solución no encontrada"));
+
+        // Actualizar modalidad de atención si está presente
+        if (request.getModalidadAtencion() != null) {
+            try {
+                UbicacionAtencion modalidad = UbicacionAtencion.valueOf(request.getModalidadAtencion().toLowerCase());
+                incidencia.setUbicacionAtencion(modalidad);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Modalidad de atención inválida: " + request.getModalidadAtencion());
+            }
+        }
+
+        // Actualizar estado si está presente
+        if (request.getEstado() != null) {
+            try {
+                EstadoIncidencia nuevoEstado = EstadoIncidencia.valueOf(request.getEstado().toLowerCase());
+                incidencia.setEstado(nuevoEstado);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Estado de incidencia inválido: " + request.getEstado());
+            }
+        }
+
+        // Guardar cambios en la incidencia
+        incidenciaRepo.save(incidencia);
+
+        // Crear o actualizar historial
+        HistorialEquipo historial = historialEquipoRepo.findByIncidencia(incidencia).orElse(new HistorialEquipo());
+        historial.setIncidencia(incidencia);
+        historial.setSolucion(solucion);
+        historial.setPalabrasClave(request.getPalabrasClave());
+        historial.setFechaSolucion(LocalDateTime.now());
+
+        return historialEquipoRepo.save(historial);
+    }
+
 }

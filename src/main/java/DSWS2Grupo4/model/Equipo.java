@@ -12,7 +12,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "equipos") // Mapeo correcto con la tabla en la base de datos
 public class Equipo {
@@ -34,45 +40,4 @@ public class Equipo {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoEquipo estado;
-
-    // Getters y Setters
-    public Long getIdEquipo() {
-        return idEquipo;
-    }
-
-    public void setIdEquipo(Long idEquipo) {
-        this.idEquipo = idEquipo;
-    }
-
-    public String getCodigoEquipo() {
-        return codigoEquipo;
-    }
-
-    public void setCodigoEquipo(String codigoEquipo) {
-        this.codigoEquipo = codigoEquipo;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
-    public String getMarca() {
-        return marca;
-    }
-
-    public void setMarca(String marca) {
-        this.marca = marca;
-    }
-
-    public EstadoEquipo getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoEquipo estado) {
-        this.estado = estado;
-    }
 }
