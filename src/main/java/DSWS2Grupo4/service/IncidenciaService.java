@@ -30,7 +30,7 @@ public class IncidenciaService {
 
 
     public IncidenciaResponse registrarIncidenciaPublica(IncidenciaRequest req) {
-        // Validar equipo
+        // Buscar equipo
         Equipo equipo = equipoRepo.findByCodigoEquipo(req.getCodigoEquipo())
                 .orElseThrow(() -> new EntityNotFoundException("Equipo no encontrado"));
 
@@ -41,16 +41,25 @@ public class IncidenciaService {
         // Determinar prioridad por dominio de correo
         Integer prioridadUsuarioCalculada = calcularPrioridadPorCorreo(req.getCorreo());
 
-        // Crear o actualizar usuario solicitante
-        UsuarioSolicitante usuario = usuarioRepo
-                .findByCorreoNumeroAndEquipo_IdEquipo(req.getCorreo(), equipo.getIdEquipo())
-                .orElseGet(() -> {
-                    UsuarioSolicitante u = new UsuarioSolicitante();
-                    u.setCorreoNumero(req.getCorreo());
+        // Buscar si existe un usuario con el mismo correo pero sin equipo asignado
+        UsuarioSolicitante usuario = usuarioRepo.findByCorreoNumeroAndEquipoIsNull(req.getCorreo())
+                .map(u -> {
+                    // Actualizar usuario existente sin equipo
                     u.setEquipo(equipo);
                     u.setPrioridadUsuario(prioridadUsuarioCalculada);
                     return usuarioRepo.save(u);
-                });
+                })
+                // Si no existe un usuario sin equipo, buscar si existe con el mismo correo y equipo (reutiliza el usuario)
+                .orElseGet(() -> usuarioRepo
+                        .findByCorreoNumeroAndEquipo_IdEquipo(req.getCorreo(), equipo.getIdEquipo())
+                        .orElseGet(() -> {
+                            // Crear usuario nuevo
+                            UsuarioSolicitante u = new UsuarioSolicitante();
+                            u.setCorreoNumero(req.getCorreo());
+                            u.setEquipo(equipo);
+                            u.setPrioridadUsuario(prioridadUsuarioCalculada);
+                            return usuarioRepo.save(u);
+                        }));
 
         // Crear incidencia
         Incidencia inc = new Incidencia();

@@ -1,4 +1,4 @@
-package DSWS2Grupo4.dto;
+package DSWS2Grupo4.DTO;
 
 import lombok.Getter;
 import lombok.Setter;
