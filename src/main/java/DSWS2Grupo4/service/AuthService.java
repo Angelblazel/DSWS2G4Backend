@@ -55,7 +55,7 @@ public class AuthService {
                 .username(request.getUsername())
                 .password_hash(passwordEncoder.encode(request.getPassword_hash()))
                 .nombre(request.getNombre())
-                .role(  Rol.LOGISTICA)
+                .role(  request.getRole() != null ? request.getRole() : Rol.LOGISTICA)
                 .build();
         userRepository.save(user);          
         return AuthResponse.builder()
