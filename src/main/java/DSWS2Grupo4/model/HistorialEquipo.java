@@ -1,5 +1,7 @@
 package DSWS2Grupo4.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,9 +23,11 @@ public class HistorialEquipo {
 
     @OneToOne
     @JoinColumn(name = "id_incidencia", unique = true)
+    @JsonBackReference
     private Incidencia incidencia;
 
     @ManyToOne
+    @JsonIgnore 
     @JoinColumn(name = "id_solucion_problema")
     private SolucionSubcategoria solucion;
 

@@ -1,5 +1,6 @@
 package DSWS2Grupo4.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +43,7 @@ public class Incidencia {
     private LocalDateTime fecha;
 
     @OneToOne(mappedBy = "incidencia")
+    @JsonManagedReference 
     private AsignacionIncidencia asignacion;
 
     // Método de conveniencia para obtener el empleado asociado al técnico asignado
@@ -50,5 +52,6 @@ public class Incidencia {
     }
 
     @OneToOne(mappedBy = "incidencia", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private HistorialEquipo historialEquipo;
 }

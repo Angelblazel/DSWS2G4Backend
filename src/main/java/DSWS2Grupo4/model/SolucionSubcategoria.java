@@ -1,5 +1,6 @@
 package DSWS2Grupo4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,5 +29,6 @@ public class SolucionSubcategoria {
     private String solucionProblema;
 
     @OneToMany(mappedBy = "solucion")
+    @JsonIgnore 
     private List<HistorialEquipo> historiales;
 }
