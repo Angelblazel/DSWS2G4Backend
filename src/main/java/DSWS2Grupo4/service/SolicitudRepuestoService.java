@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class SolicitudRepuestoService {
 
@@ -35,13 +37,16 @@ public class SolicitudRepuestoService {
 
         Incidencia incidencia = incidenciaRepo.findById(request.getIdIncidencia())
                 .orElseThrow(() -> new EntityNotFoundException("Incidencia no encontrada"));
-
+        //Validando que el técnico esté asignado a la incidencia
+        if (incidencia.getAsignacion() == null ||
+                !incidencia.getAsignacion().getTecnico().getId().equals(tecnico.getId())) {
+            throw new IllegalArgumentException("El técnico no está asignado a la incidencia.");
+        }
         // Crear cabecera
         SolicitudRepuesto solicitud = new SolicitudRepuesto();
         solicitud.setTecnico(tecnico);
         solicitud.setIncidencia(incidencia);
-        //solicitud.setEstado(EstadoSolicitudRepuesto.pendiente);
-        solicitud.setEstado("PENDIENTE");
+        solicitud.setEstado(EstadoSolicitudRepuesto.PENDIENTE);
         solicitud = solicitudRepo.save(solicitud);
 
         // Crear cada detalle
@@ -66,11 +71,16 @@ public class SolicitudRepuestoService {
         SolicitudRepuesto solicitud = solicitudRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada"));
 
-        EstadoSolicitudRepuesto estado = EstadoSolicitudRepuesto.valueOf(nuevoEstado.toUpperCase());
+        // Validar si el nuevo estado es válido (opcional pero recomendable)
+        if (!nuevoEstado.equalsIgnoreCase("PENDIENTE") &&
+                !nuevoEstado.equalsIgnoreCase("ATENDIDO") &&
+                !nuevoEstado.equalsIgnoreCase("RECHAZADO")) {
+            throw new IllegalArgumentException("Estado no válido: " + nuevoEstado);
+        }
 
-        //solicitud.setEstado(EstadoSolicitudRepuesto.pendiente);
-        solicitud.setEstado("PENDIENTE");
+        solicitud.setEstado(nuevoEstado.toUpperCase());
         solicitudRepo.save(solicitud);
     }
+
 
 }

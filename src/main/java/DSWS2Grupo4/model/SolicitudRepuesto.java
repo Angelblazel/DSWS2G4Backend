@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "solicitudes_repuestos")
@@ -34,12 +35,11 @@ public class SolicitudRepuesto {
     @Column(name = "fecha_solicitud")
     private LocalDateTime fechaSolicitud = LocalDateTime.now();
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "estado")
-//    private EstadoSolicitudRepuesto estado = EstadoSolicitudRepuesto.pendiente
-//    Enum: pendiente, atendido, rechazado
-
     @Column(name = "estado")
-    private String estado = "PENDIENTE";
+    private String estado;
+
+    @OneToMany(mappedBy = "solicitud", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<DetalleSolicitudRepuesto> detalles;
+
 }
 

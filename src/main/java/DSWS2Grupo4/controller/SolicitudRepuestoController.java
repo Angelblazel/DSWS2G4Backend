@@ -1,6 +1,7 @@
 package DSWS2Grupo4.controller;
 
 import DSWS2Grupo4.DTO.ActualizarEstadoSolicitudDTO;
+import DSWS2Grupo4.DTO.SolicitudRepuestoDTO;
 import DSWS2Grupo4.DTO.SolicitudRepuestoRequest;
 import DSWS2Grupo4.model.EstadoSolicitudRepuesto;
 import DSWS2Grupo4.model.SolicitudRepuesto;
@@ -23,13 +24,29 @@ public class SolicitudRepuestoController {
     @Autowired
     private SolicitudRepuestoRepository solicitudRepo;
 
+    @GetMapping
+    public ResponseEntity<List<SolicitudRepuestoDTO>> listarSolicitudesPendientes() {
+        List<SolicitudRepuesto> solicitudes = solicitudRepo.findAll();
 
-    @GetMapping("/pendientes")
-    public ResponseEntity<List<SolicitudRepuesto>> listarSolicitudesPendientes() {
-        List<SolicitudRepuesto> pendientes = solicitudRepo.findByEstado("PENDIENTE");
-        return ResponseEntity.ok(pendientes);
+        List<SolicitudRepuestoDTO> resultado = solicitudes.stream().map(sol -> {
+            SolicitudRepuestoDTO dto = new SolicitudRepuestoDTO();
+            dto.setId(sol.getId());
+            dto.setEstado(sol.getEstado());
+            dto.setFechaSolicitud(sol.getFechaSolicitud());
+
+            // Tomamos solo el primer detalle
+            if (sol.getDetalles() != null && !sol.getDetalles().isEmpty()) {
+                var detalle = sol.getDetalles().get(0);
+                dto.setCantidad(detalle.getCantidad());
+                dto.setCodigoRepuesto(detalle.getRepuesto().getCodigoRepuesto());
+                dto.setNombreRepuesto(detalle.getRepuesto().getNombre());
+            }
+
+            return dto;
+        }).toList();
+
+        return ResponseEntity.ok(resultado);
     }
-
 
     // Endpoint para registrar solicitud de repuesto
     @PostMapping
