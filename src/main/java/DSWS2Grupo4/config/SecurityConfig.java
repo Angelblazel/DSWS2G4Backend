@@ -37,6 +37,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/api/v1/tecnico/**").hasAuthority("TECNICO")
+                                .requestMatchers("/api/v1/repuesto/**").hasAuthority("LOGISTICA")
                                 .requestMatchers(HttpMethod.GET).permitAll()
                                 .requestMatchers(HttpMethod.POST).permitAll()
                                 .anyRequest().authenticated()
