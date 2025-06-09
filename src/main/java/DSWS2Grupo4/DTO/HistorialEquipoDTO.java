@@ -1,4 +1,4 @@
-package DSWS2Grupo4.dto;
+package DSWS2Grupo4.DTO;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

@@ -7,5 +7,7 @@ import lombok.Setter;
 @Setter
 public class DetalleSolicitudDTO {
     private Long idRepuesto; // ID del repuesto solicitado
-    private int cantidad;    // Cantidad solicitada
+    private String nombreRepuesto; // Nombre del repuesto
+    private Integer cantidad;    // Cantidad solicitada
+    private String descripcion; // Descripción del repuesto
 }

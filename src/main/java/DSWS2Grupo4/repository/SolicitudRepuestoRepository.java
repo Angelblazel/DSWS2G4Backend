@@ -9,6 +9,7 @@ import java.util.List;
 
 @Repository
 public interface SolicitudRepuestoRepository extends JpaRepository<SolicitudRepuesto, Long> {
-    List<SolicitudRepuesto> findByEstadoIgnoreCase(String estado);
-
+    List<SolicitudRepuesto> findByEstado(EstadoSolicitudRepuesto estado);
+    List<SolicitudRepuesto> findByTecnicoId(Long tecnicoId);
+    List<SolicitudRepuesto> findByIncidenciaId(Long incidenciaId);
 }

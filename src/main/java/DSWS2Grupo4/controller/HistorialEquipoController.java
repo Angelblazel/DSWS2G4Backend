@@ -2,7 +2,7 @@ package DSWS2Grupo4.controller;
 
 import DSWS2Grupo4.DTO.CodigoEquipoRequest;
 import DSWS2Grupo4.DTO.PalabraClaveRequest;
-import DSWS2Grupo4.dto.HistorialEquipoDTO;
+import DSWS2Grupo4.DTO.HistorialEquipoDTO;
 import DSWS2Grupo4.service.HistorialEquipoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

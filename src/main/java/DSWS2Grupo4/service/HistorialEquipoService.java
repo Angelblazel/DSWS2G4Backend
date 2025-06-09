@@ -1,6 +1,6 @@
 package DSWS2Grupo4.service;
 
-import DSWS2Grupo4.dto.HistorialEquipoDTO;
+import DSWS2Grupo4.DTO.HistorialEquipoDTO;
 import DSWS2Grupo4.model.HistorialEquipo;
 import DSWS2Grupo4.repository.HistorialEquipoRepository;
 import org.springframework.stereotype.Service;

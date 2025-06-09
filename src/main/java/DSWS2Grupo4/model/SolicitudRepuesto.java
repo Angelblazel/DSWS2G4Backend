@@ -35,11 +35,11 @@ public class SolicitudRepuesto {
     @Column(name = "fecha_solicitud")
     private LocalDateTime fechaSolicitud = LocalDateTime.now();
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado")
-    private String estado;
+    private EstadoSolicitudRepuesto estado = EstadoSolicitudRepuesto.PENDIENTE;
 
     @OneToMany(mappedBy = "solicitud", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<DetalleSolicitudRepuesto> detalles;
-
 }
 

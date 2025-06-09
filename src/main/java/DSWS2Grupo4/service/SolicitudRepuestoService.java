@@ -1,7 +1,6 @@
 package DSWS2Grupo4.service;
 
-import DSWS2Grupo4.DTO.DetalleSolicitudDTO;
-import DSWS2Grupo4.DTO.SolicitudRepuestoRequest;
+import DSWS2Grupo4.DTO.*;
 import DSWS2Grupo4.model.*;
 import DSWS2Grupo4.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SolicitudRepuestoService {
@@ -31,17 +31,19 @@ public class SolicitudRepuestoService {
 
     @Transactional
     public void registrarSolicitud(SolicitudRepuestoRequest request) {
-        // Validar técnico e incidencia
-        Tecnico tecnico = tecnicoRepo.findById(request.getIdTecnico())
-                .orElseThrow(() -> new EntityNotFoundException("Técnico no encontrado"));
+        // Validar técnico usando ID de empleado en lugar de ID de técnico
+        Tecnico tecnico = tecnicoRepo.findByEmpleadoId(request.getIdTecnico().intValue())
+                .orElseThrow(() -> new EntityNotFoundException("Técnico no encontrado para el empleado ID: " + request.getIdTecnico()));
 
         Incidencia incidencia = incidenciaRepo.findById(request.getIdIncidencia())
                 .orElseThrow(() -> new EntityNotFoundException("Incidencia no encontrada"));
+        
         //Validando que el técnico esté asignado a la incidencia
         if (incidencia.getAsignacion() == null ||
                 !incidencia.getAsignacion().getTecnico().getId().equals(tecnico.getId())) {
             throw new IllegalArgumentException("El técnico no está asignado a la incidencia.");
         }
+        
         // Crear cabecera
         SolicitudRepuesto solicitud = new SolicitudRepuesto();
         solicitud.setTecnico(tecnico);
@@ -62,7 +64,7 @@ public class SolicitudRepuestoService {
             detalle.setSolicitud(solicitud);
             detalle.setRepuesto(repuesto);
             detalle.setCantidad(detalleDTO.getCantidad());
-
+            
             detalleRepo.save(detalle);
         }
     }
@@ -70,17 +72,29 @@ public class SolicitudRepuestoService {
     public void actualizarEstadoSolicitud(Long id, String nuevoEstado) {
         SolicitudRepuesto solicitud = solicitudRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada"));
-
-        // Validar si el nuevo estado es válido (opcional pero recomendable)
-        if (!nuevoEstado.equalsIgnoreCase("PENDIENTE") &&
-                !nuevoEstado.equalsIgnoreCase("ATENDIDO") &&
-                !nuevoEstado.equalsIgnoreCase("RECHAZADO")) {
-            throw new IllegalArgumentException("Estado no válido: " + nuevoEstado);
+        
+        try {
+            EstadoSolicitudRepuesto estado = EstadoSolicitudRepuesto.valueOf(nuevoEstado.toUpperCase());
+            solicitud.setEstado(estado);
+            solicitudRepo.save(solicitud);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Estado inválido: " + nuevoEstado);
         }
-
-        solicitud.setEstado(nuevoEstado.toUpperCase());
-        solicitudRepo.save(solicitud);
     }
 
+    public List<RepuestoDTO> listarRepuestos() {
+        return repuestoRepo.findAll().stream()
+                .map(r -> new RepuestoDTO(r.getId(), r.getCodigoRepuesto(), r.getNombre(), r.getDescripcion(), r.getCantidad()))
+                .collect(Collectors.toList());
+    }
 
+    public List<RepuestoDTO> buscarRepuestosPorNombre(String nombre) {
+        return repuestoRepo.findByNombreContainingIgnoreCase(nombre).stream()
+                .map(r -> new RepuestoDTO(r.getId(), r.getCodigoRepuesto(), r.getNombre(), r.getDescripcion(), r.getCantidad()))
+                .collect(Collectors.toList());
+    }
+
+    public List<SolicitudRepuesto> listarSolicitudesPendientes() {
+        return solicitudRepo.findByEstado(EstadoSolicitudRepuesto.PENDIENTE);
+    }
 }
