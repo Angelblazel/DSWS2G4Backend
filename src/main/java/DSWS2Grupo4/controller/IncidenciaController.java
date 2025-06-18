@@ -8,12 +8,14 @@ import DSWS2Grupo4.model.UsuarioSolicitante;
 import DSWS2Grupo4.service.AlertaIncidenciaService;
 import DSWS2Grupo4.service.IncidenciaService;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/incidencias")
@@ -100,14 +102,26 @@ public class IncidenciaController {
 
     // Envio de alerta
     @PostMapping("/alerta")
-    public ResponseEntity<String> registrarAlerta(@RequestBody AlertaRequest req) {
+    public ResponseEntity<Map<String, String>> registrarAlerta(@RequestBody AlertaRequest req) {
         try {
+            System.out.println("========== ALERTA RECIBIDA ==========");
+            System.out.println("ID: " + req.getIdIncidencia());
+            System.out.println("Motivo: " + req.getMotivo());
+
             alertaService.registrarAlerta(req);
-            return ResponseEntity.ok("Alerta registrada correctamente.");
+
+            Map<String, String> response = new HashMap<>();
+            response.put("mensaje", "Alerta registrada correctamente.");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            e.printStackTrace();
+
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("mensaje", "Error al registrar alerta: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
+
 
     //Buscar por ID Publico
     @GetMapping("/publica/{id}")
