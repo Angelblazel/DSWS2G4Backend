@@ -54,10 +54,11 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/incidencias/*/soluciones").hasAuthority("TECNICO")
                                 .requestMatchers("/api/v1/tecnico/incidencias/**").hasAuthority("TECNICO")
                                 .requestMatchers("/api/v1/incidencias/solucion").hasAuthority("TECNICO")
-                                .requestMatchers("/api/v1/solicitudes-repuestos").hasAuthority("TECNICO")
+                                
                                 
                                 // Técnico y Logística
                                 .requestMatchers("/api/v1/solicitudes-repuestos/repuestos").hasAnyAuthority("TECNICO", "LOGISTICA")
+                                .requestMatchers("/api/v1/solicitudes-repuestos").hasAnyAuthority("TECNICO", "LOGISTICA")
                                 
                                 // Logística
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/solicitudes-repuestos/*").hasAuthority("LOGISTICA")
