@@ -63,7 +63,7 @@ public class SecurityConfig {
                                 // Logística
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/solicitudes-repuestos/*").hasAuthority("LOGISTICA")
                                 .requestMatchers("/api/v1/repuesto/**").hasAuthority("LOGISTICA")
-                                
+                                .requestMatchers("/api/v1/repuesto").hasAuthority("LOGISTICA")
       
                                 /*.requestMatchers("/api/v1/tecnico/**").hasAuthority("TECNICO")
                                 .requestMatchers("/api/v1/repuesto/**").hasAuthority("LOGISTICA")
