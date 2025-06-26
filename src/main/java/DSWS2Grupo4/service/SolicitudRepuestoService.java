@@ -69,17 +69,31 @@ public class SolicitudRepuestoService {
         }
     }
 
+    @Transactional
     public void actualizarEstadoSolicitud(Long id, String nuevoEstado) {
         SolicitudRepuesto solicitud = solicitudRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada"));
-        
-        try {
-            EstadoSolicitudRepuesto estado = EstadoSolicitudRepuesto.valueOf(nuevoEstado.toUpperCase());
-            solicitud.setEstado(estado);
-            solicitudRepo.save(solicitud);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Estado inválido: " + nuevoEstado);
+
+        EstadoSolicitudRepuesto estado = EstadoSolicitudRepuesto.valueOf(nuevoEstado.toUpperCase());
+
+        if (estado == EstadoSolicitudRepuesto.ATENDIDO) {
+            // Descontar
+            solicitud.getDetalles().forEach(detalle -> {
+                Repuesto repuesto = repuestoRepo.findById(detalle.getRepuesto().getId())
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "Repuesto no encontrado con id: " + detalle.getRepuesto().getId()));
+
+                int nuevaCantidad = repuesto.getCantidad() - detalle.getCantidad();
+                if (nuevaCantidad < 0) {
+                    throw new IllegalArgumentException(
+                            "Stock insuficiente para el repuesto " + repuesto.getCodigoRepuesto());
+                }
+                repuesto.setCantidad(nuevaCantidad);
+                repuestoRepo.save(repuesto);
+            });
         }
+        solicitud.setEstado(estado);
+        solicitudRepo.save(solicitud);
     }
 
     public List<RepuestoDTO> listarRepuestos() {
