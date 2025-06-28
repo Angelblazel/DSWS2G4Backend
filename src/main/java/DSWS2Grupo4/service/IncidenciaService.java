@@ -149,7 +149,12 @@ public class IncidenciaService {
         if (!incidenciaRepo.existsById(id)) {
             throw new EntityNotFoundException("Incidencia no encontrada con ID: " + id);
         }
+
         incidencia.setId(id);
+
+        // Establecer la fecha actual al momento de actualizar
+        incidencia.setFecha(LocalDateTime.now());
+
         return incidenciaRepo.save(incidencia);
     }
 
