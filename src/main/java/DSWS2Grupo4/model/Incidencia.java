@@ -47,7 +47,7 @@ public class Incidencia {
     private AsignacionIncidencia asignacion;
 
     // Método de conveniencia para obtener el empleado asociado al técnico asignado
-    public Empleado getTecnico() {
+    public Usuario getTecnico() {
         return asignacion != null ? asignacion.getTecnico().getEmpleado() : null;
     }
 

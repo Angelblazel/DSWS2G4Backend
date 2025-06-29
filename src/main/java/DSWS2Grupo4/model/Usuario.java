@@ -9,7 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -22,15 +21,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 
 @Entity
-@Table(name = "empleados")
+@Table(name = "usuarios")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Empleado implements UserDetails {
+public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_empleado")
+    @Column(name = "id_usuario")
     private Integer idEmpleado;
 
     @Column(unique = true, nullable = false)
@@ -38,9 +37,6 @@ public class Empleado implements UserDetails {
 
     @Column(nullable = false)
     private String password_hash;
-
-    @Column(nullable = false)
-    private String nombre;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

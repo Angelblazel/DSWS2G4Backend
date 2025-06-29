@@ -149,7 +149,12 @@ public class IncidenciaService {
         if (!incidenciaRepo.existsById(id)) {
             throw new EntityNotFoundException("Incidencia no encontrada con ID: " + id);
         }
+
         incidencia.setId(id);
+
+        // Establecer la fecha actual al momento de actualizar
+        incidencia.setFecha(LocalDateTime.now());
+
         return incidenciaRepo.save(incidencia);
     }
 
@@ -176,7 +181,7 @@ public class IncidenciaService {
 
             // técnico asignado (si existe)
             asignacionRepo.findByIncidencia(incidencia).ifPresent(asig ->
-                    dto.setTecnicoAsignado(asig.getTecnico().getEmpleado().getNombre())
+                    dto.setTecnicoAsignado(asig.getTecnico().getEmpleado().getUsername())
             );
 
             // historial de solución (si existe)

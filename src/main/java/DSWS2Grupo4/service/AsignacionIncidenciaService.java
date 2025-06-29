@@ -105,7 +105,7 @@ public class AsignacionIncidenciaService {
 
         AsignacionResponse response = new AsignacionResponse();
         response.setIdTecnico(tecnico.getId());
-        response.setNombreTecnico(tecnico.getEmpleado().getNombre());
+        response.setNombreTecnico(tecnico.getEmpleado().getUsername());
         response.setCargaActual(tecnico.getCargaActual());
         response.setCargaMaxima(tecnico.getCargaMaxima());
         response.setIdIncidencia(incidencia.getId());

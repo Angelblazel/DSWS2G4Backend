@@ -1,7 +1,6 @@
 
 package DSWS2Grupo4.config;
 
-import DSWS2Grupo4.repository.EmpleadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,13 +12,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import DSWS2Grupo4.repository.UsuarioRepository;
 
 
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
     
-    private final EmpleadoRepository userRepository;
+    private final UsuarioRepository userRepository;
     
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{

@@ -4,9 +4,8 @@ import DSWS2Grupo4.DTO.AuthResponse;
 import DSWS2Grupo4.DTO.LoginRequest;
 import DSWS2Grupo4.Jwt.JwtService;
 import DSWS2Grupo4.DTO.RegisterRequest;
-import DSWS2Grupo4.model.Empleado;
+import DSWS2Grupo4.model.Usuario;
 import DSWS2Grupo4.model.Rol;
-import DSWS2Grupo4.repository.EmpleadoRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,13 +15,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
+import DSWS2Grupo4.repository.UsuarioRepository;
 
 
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final EmpleadoRepository userRepository;
+    private final UsuarioRepository userRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -35,7 +35,7 @@ public class AuthService {
         ));
 
         // Buscar el usuario en la base de datos
-        Empleado empleado = userRepository.findByUsername(request.getUsername())
+        Usuario empleado = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
         // Generar el token JWT
@@ -45,16 +45,14 @@ public class AuthService {
         return AuthResponse.builder()
                 .token(token)
                 .idEmpleado(empleado.getIdEmpleado())
-                .nombre(empleado.getNombre())
                 .rol(empleado.getRole().name())
                 .build();
     }
     
     public AuthResponse register(RegisterRequest request){
-        Empleado user = Empleado.builder()
+        Usuario user = Usuario.builder()
                 .username(request.getUsername())
                 .password_hash(passwordEncoder.encode(request.getPassword_hash()))
-                .nombre(request.getNombre())
                 .role(  request.getRole() != null ? request.getRole() : Rol.LOGISTICA)
                 .build();
         userRepository.save(user);          
