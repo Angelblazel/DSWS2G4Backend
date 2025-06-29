@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmpleadoDTO {
+public class UsuarioDTO {
     int idEmpleado;
-    String nombre;
     String username;
 }

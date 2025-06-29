@@ -181,7 +181,7 @@ public class IncidenciaService {
 
             // técnico asignado (si existe)
             asignacionRepo.findByIncidencia(incidencia).ifPresent(asig ->
-                    dto.setTecnicoAsignado(asig.getTecnico().getEmpleado().getNombre())
+                    dto.setTecnicoAsignado(asig.getTecnico().getEmpleado().getUsername())
             );
 
             // historial de solución (si existe)

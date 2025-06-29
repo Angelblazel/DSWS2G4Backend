@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class EmpleadoResponse {
+public class UsuarioResponse {
     String message;
 }

@@ -19,5 +19,5 @@ public class Logistica {
 
     @OneToOne
     @JoinColumn(name = "id_empleado", nullable = false, unique = true)
-    private Empleado empleado;
+    private Usuario empleado;
 }
