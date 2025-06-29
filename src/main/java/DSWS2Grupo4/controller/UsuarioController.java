@@ -1,7 +1,7 @@
 package DSWS2Grupo4.controller;
-import DSWS2Grupo4.DTO.EmpleadoDTO;
-import DSWS2Grupo4.DTO.EmpleadoRequest;
-import DSWS2Grupo4.DTO.EmpleadoResponse;
+import DSWS2Grupo4.DTO.UsuarioDTO;
+import DSWS2Grupo4.DTO.UsuarioRequest;
+import DSWS2Grupo4.DTO.UsuarioResponse;
 import DSWS2Grupo4.service.EmpleadoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,13 +18,13 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(value = "/api/v1/user")
 @RequiredArgsConstructor
 //@CrossOrigin(origins = {"http://localhost:4200"})
-public class EmpleadoController {
+public class UsuarioController {
     private final EmpleadoService userService;
     
     @GetMapping(value = "{id}")
-    public ResponseEntity<EmpleadoDTO> getUser(@PathVariable Integer id)
+    public ResponseEntity<UsuarioDTO> getUser(@PathVariable Integer id)
     {
-        EmpleadoDTO userDTO = userService.getUser(id);
+        UsuarioDTO userDTO = userService.getUser(id);
         if (userDTO==null)
         {
            return ResponseEntity.notFound().build();
@@ -33,7 +33,7 @@ public class EmpleadoController {
     }
 
     @PutMapping()
-    public ResponseEntity<EmpleadoResponse> updateUser(@RequestBody EmpleadoRequest userRequest)
+    public ResponseEntity<UsuarioResponse> updateUser(@RequestBody UsuarioRequest userRequest)
     {
         return ResponseEntity.ok(userService.updateUser(userRequest));
     }

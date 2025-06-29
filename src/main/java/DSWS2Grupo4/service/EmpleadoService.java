@@ -1,43 +1,39 @@
 package DSWS2Grupo4.service;
 
-import DSWS2Grupo4.DTO.EmpleadoDTO;
-import DSWS2Grupo4.DTO.EmpleadoRequest;
-import DSWS2Grupo4.DTO.EmpleadoResponse;
-import DSWS2Grupo4.model.Empleado;
+import DSWS2Grupo4.DTO.UsuarioDTO;
+import DSWS2Grupo4.DTO.UsuarioRequest;
+import DSWS2Grupo4.DTO.UsuarioResponse;
+import DSWS2Grupo4.model.Usuario;
 import DSWS2Grupo4.model.Rol;
-import DSWS2Grupo4.repository.EmpleadoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import DSWS2Grupo4.repository.UsuarioRepository;
 
 @Service
 @RequiredArgsConstructor
 public class EmpleadoService {
-    private final EmpleadoRepository userRepository; 
+    private final UsuarioRepository userRepository; 
 
     @Transactional
-    public EmpleadoResponse updateUser(EmpleadoRequest userRequest) {
+    public UsuarioResponse updateUser(UsuarioRequest userRequest) {
        
-        Empleado user = Empleado.builder()
+        Usuario user = Usuario.builder()
         .idEmpleado(userRequest.getIdEmpleado())
-        .nombre(userRequest.getNombre())
         .role(  Rol.LOGISTICA)
         .build();
         
-        userRepository.updateUser(user.getIdEmpleado(), user.getNombre());
-
-        return new EmpleadoResponse("El usuario se registró satisfactoriamente");
+        return new UsuarioResponse("El usuario se registró satisfactoriamente");
     }
 
-    public EmpleadoDTO getUser(Integer id) {
-        Empleado user= userRepository.findById(id).orElse(null);
+    public UsuarioDTO getUser(Integer id) {
+        Usuario user= userRepository.findById(id).orElse(null);
        
         if (user!=null)
         {
-            EmpleadoDTO userDTO = EmpleadoDTO.builder()
+            UsuarioDTO userDTO = UsuarioDTO.builder()
             .idEmpleado(user.getIdEmpleado())
             .username(user.getUsername())
-            .nombre(user.getNombre())
             .build();
             return userDTO;
         }

@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class EmpleadoRequest {
+public class UsuarioRequest {
     int idEmpleado;
-    String nombre;
     String username;
 }

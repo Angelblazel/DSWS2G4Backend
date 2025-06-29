@@ -23,7 +23,7 @@ public class Tecnico {
 
     @OneToOne
     @JoinColumn(name = "id_empleado", nullable = false)
-    private Empleado empleado;
+    private Usuario empleado;
 
     @Column(name = "carga_maxima", nullable = false)
     private int cargaMaxima = 6;

@@ -102,7 +102,7 @@ public class SolicitudRepuestoController {
             dto.setFechaSolicitud(solicitudActualizada.getFechaSolicitud());
 
             if (solicitudActualizada.getTecnico() != null && solicitudActualizada.getTecnico().getEmpleado() != null) {
-                dto.setNombreTecnico(solicitudActualizada.getTecnico().getEmpleado().getNombre());
+                dto.setNombreTecnico(solicitudActualizada.getTecnico().getEmpleado().getUsername());
             }
 
             if (solicitudActualizada.getIncidencia() != null) {
@@ -140,7 +140,7 @@ public class SolicitudRepuestoController {
 
                 // Agregar información del técnico
                 if (sol.getTecnico() != null && sol.getTecnico().getEmpleado() != null) {
-                    dto.setNombreTecnico(sol.getTecnico().getEmpleado().getNombre());
+                    dto.setNombreTecnico(sol.getTecnico().getEmpleado().getUsername());
                 }
 
                 // Agregar información de la incidencia
