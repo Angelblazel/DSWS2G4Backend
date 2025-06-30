@@ -1,10 +1,6 @@
 package DSWS2Grupo4.service;
 
-import DSWS2Grupo4.DTO.IncidenciaRequest;
-import DSWS2Grupo4.DTO.IncidenciaResponse;
-import DSWS2Grupo4.DTO.IncidenciaTecnicoDTO;
-import DSWS2Grupo4.DTO.SeguimientoIncidenciaDTO;
-import DSWS2Grupo4.DTO.SolucionRequest;
+import DSWS2Grupo4.DTO.*;
 import DSWS2Grupo4.model.*;
 import DSWS2Grupo4.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -244,6 +240,84 @@ public class IncidenciaService {
         historial.setFechaSolucion(LocalDateTime.now());
 
         return historialEquipoRepo.save(historial);
+    }
+
+    // Métodos para reporte de incidencias por fechas
+    public List<ReporteIncidenciaDTO> generarReporteIncidencias(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        List<Incidencia> incidencias;
+
+        if (fechaInicio != null && fechaFin != null) {
+            incidencias = incidenciaRepo.findByFechaBetween(fechaInicio, fechaFin);
+        } else if (fechaInicio != null) {
+            incidencias = incidenciaRepo.findByFechaGreaterThanEqual(fechaInicio);
+        } else if (fechaFin != null) {
+            incidencias = incidenciaRepo.findByFechaLessThanEqual(fechaFin);
+        } else {
+            incidencias = incidenciaRepo.findAll();
+        }
+
+        return incidencias.stream()
+                .map(this::convertToReporteDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Método para que el usuario solicitante edite su incidencia
+    public Incidencia editarIncidenciaPorSolicitante(Long idIncidencia, String correoSolicitante, IncidenciaRequest nuevosdatos) {
+        Incidencia incidencia = incidenciaRepo.findById(idIncidencia)
+                .orElseThrow(() -> new EntityNotFoundException("Incidencia no encontrada"));
+
+        // Verificar que el correo coincida con el solicitante
+        if (!incidencia.getUsuarioSolicitante().getCorreoNumero().equals(correoSolicitante)) {
+            throw new IllegalStateException("No tiene permisos para editar esta incidencia");
+        }
+
+        // Verificar que la incidencia no esté asignada
+        if (incidencia.getAsignacion() != null) {
+            throw new IllegalStateException("No se puede editar una incidencia que ya ha sido asignada a un técnico");
+        }
+
+        // Verificar que esté en estado pendiente
+        if (incidencia.getEstado() != EstadoIncidencia.pendiente) {
+            throw new IllegalStateException("Solo se pueden editar incidencias en estado pendiente");
+        }
+
+        // Actualizar el problema si se proporciona
+        if (nuevosdatos.getProblemaId() != null) {
+            ProblemaSubcategoria nuevoProblema = problemaRepo.findById(nuevosdatos.getProblemaId())
+                    .orElseThrow(() -> new EntityNotFoundException("Problema no encontrado"));
+            incidencia.setProblemaSubcategoria(nuevoProblema);
+        }
+
+        return incidenciaRepo.save(incidencia);
+    }
+
+    private ReporteIncidenciaDTO convertToReporteDTO(Incidencia incidencia) {
+        String tecnicoAsignado = null;
+        if (incidencia.getAsignacion() != null && incidencia.getAsignacion().getTecnico() != null) {
+            tecnicoAsignado = incidencia.getAsignacion().getTecnico().getEmpleado().getUsername();
+        }
+
+        Integer prioridad = 0;
+        if (incidencia.getUsuarioSolicitante().getPrioridadUsuario() != null) {
+            prioridad += incidencia.getUsuarioSolicitante().getPrioridadUsuario();
+        }
+        if (incidencia.getProblemaSubcategoria().getPrioridadProblema() != null) {
+            prioridad += incidencia.getProblemaSubcategoria().getPrioridadProblema();
+        }
+
+        return new ReporteIncidenciaDTO(
+                incidencia.getId(),
+                incidencia.getUsuarioSolicitante().getCorreoNumero(),
+                incidencia.getUsuarioSolicitante().getEquipo().getCodigoEquipo(),
+                incidencia.getProblemaSubcategoria().getDescripcionProblema(),
+                incidencia.getEstado().toString(),
+                incidencia.getUbicacionAtencion().toString(),
+                incidencia.getFecha(),
+                tecnicoAsignado,
+                prioridad,
+                incidencia.getProblemaSubcategoria().getSubcategoria().getCategoria().getNombreCategoria(),
+                incidencia.getProblemaSubcategoria().getSubcategoria().getNombreSubcategoria()
+        );
     }
 
 }
