@@ -8,8 +8,11 @@ import DSWS2Grupo4.model.UsuarioSolicitante;
 import DSWS2Grupo4.service.AlertaIncidenciaService;
 import DSWS2Grupo4.service.IncidenciaService;
 import jakarta.persistence.EntityNotFoundException;
+
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -163,4 +166,33 @@ public class IncidenciaController {
         return ResponseEntity.ok(historial);
     }
 
+    // Generar reporte de incidencias
+    @GetMapping("/reporte")
+    public ResponseEntity<List<ReporteIncidenciaDTO>> generarReporte(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
+        List<ReporteIncidenciaDTO> reporte = incService.generarReporteIncidencias(fechaInicio, fechaFin);
+        return ResponseEntity.ok(reporte);
+    }
+
+    // Editar incidencia por usuario solicitante
+    @PutMapping("/editar-publica/{id}")
+    public ResponseEntity<?> editarIncidenciaPublica(
+            @PathVariable Long id,
+            @RequestParam String correo,
+            @RequestBody IncidenciaRequest request) {
+        try {
+            Incidencia incidenciaActualizada = incService.editarIncidenciaPorSolicitante(id, correo, request);
+            return ResponseEntity.ok(incidenciaActualizada);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("mensaje", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
+        }
+    }
 }

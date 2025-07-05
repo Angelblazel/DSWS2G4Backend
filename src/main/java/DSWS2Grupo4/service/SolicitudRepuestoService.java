@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,5 +111,51 @@ public class SolicitudRepuestoService {
 
     public List<SolicitudRepuesto> listarSolicitudesPendientes() {
         return solicitudRepo.findByEstado(EstadoSolicitudRepuesto.PENDIENTE);
+    }
+
+    @Transactional
+    public void editarSolicitudPorTecnico(Long idSolicitud, Integer idEmpleadoTecnico, SolicitudRepuestoRequest nuevosData) {
+        SolicitudRepuesto solicitud = solicitudRepo.findById(idSolicitud)
+                .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada"));
+
+        // Verificar que el técnico sea el propietario de la solicitud
+        if (!solicitud.getTecnico().getEmpleado().getIdEmpleado().equals(idEmpleadoTecnico)) {
+            throw new IllegalStateException("No tiene permisos para editar esta solicitud");
+        }
+
+        // Verificar que la solicitud esté en estado pendiente
+        if (solicitud.getEstado() != EstadoSolicitudRepuesto.PENDIENTE) {
+            throw new IllegalStateException("Solo se pueden editar solicitudes en estado pendiente");
+        }
+
+        // Eliminar los detalles existentes
+        detalleRepo.deleteAllBySolicitud(solicitud);
+
+        // Crear nuevos detalles
+        for (DetalleSolicitudDTO detalleDTO : nuevosData.getDetalles()) {
+            Repuesto repuesto = repuestoRepo.findById(detalleDTO.getIdRepuesto())
+                    .orElseThrow(() -> new EntityNotFoundException("Repuesto no encontrado con ID: " + detalleDTO.getIdRepuesto()));
+
+            DetalleSolicitudRepuesto detalle = new DetalleSolicitudRepuesto();
+            detalle.setSolicitud(solicitud);
+            detalle.setRepuesto(repuesto);
+            detalle.setCantidad(detalleDTO.getCantidad());
+
+            detalleRepo.save(detalle);
+        }
+
+        // Actualizar fecha de solicitud
+        solicitud.setFechaSolicitud(LocalDateTime.now());
+        solicitudRepo.save(solicitud);
+    }
+
+    // Método para obtener solicitudes de un técnico específico
+    public List<SolicitudRepuesto> obtenerSolicitudesPorTecnico(Integer idEmpleadoTecnico) {
+        Tecnico tecnico = tecnicoRepo.findByEmpleadoId(idEmpleadoTecnico)
+                .orElseThrow(() -> new EntityNotFoundException("Técnico no encontrado"));
+
+        List<SolicitudRepuesto> solicitudes = solicitudRepo.findByTecnicoId(tecnico.getId());
+
+        return solicitudes;
     }
 }

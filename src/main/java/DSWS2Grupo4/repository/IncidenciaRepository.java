@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -20,4 +21,7 @@ public interface IncidenciaRepository extends JpaRepository<Incidencia, Long> {
     );
 
     List<Incidencia> findByUsuarioSolicitante_CorreoNumero(String correo);
+    List<Incidencia> findByFechaBetween(LocalDateTime fechaInicio, LocalDateTime fechaFin);
+    List<Incidencia> findByFechaGreaterThanEqual(LocalDateTime fechaInicio);
+    List<Incidencia> findByFechaLessThanEqual(LocalDateTime fechaFin);
 }

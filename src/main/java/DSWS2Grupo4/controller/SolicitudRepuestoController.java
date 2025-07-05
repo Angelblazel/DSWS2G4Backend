@@ -5,6 +5,7 @@ import DSWS2Grupo4.DTO.DetalleRepuestoDTO;
 import DSWS2Grupo4.DTO.RepuestoDTO;
 import DSWS2Grupo4.DTO.SolicitudRepuestoDTO;
 import DSWS2Grupo4.DTO.SolicitudRepuestoRequest;
+import DSWS2Grupo4.model.EstadoSolicitudRepuesto;
 import DSWS2Grupo4.model.SolicitudRepuesto;
 import DSWS2Grupo4.repository.SolicitudRepuestoRepository;
 import DSWS2Grupo4.service.SolicitudRepuestoService;
@@ -13,11 +14,13 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/solicitudes-repuestos")
@@ -191,6 +194,66 @@ public class SolicitudRepuestoController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error interno: " + e.getMessage());
+        }
+    }
+
+    // Editar solicitud por técnico
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<?> editarSolicitudPorTecnico(
+            @PathVariable Long id,
+            @RequestParam Integer idEmpleadoTecnico,
+            @RequestBody SolicitudRepuestoRequest request) {
+        try {
+            solicitudService.editarSolicitudPorTecnico(id, idEmpleadoTecnico, request);
+            return ResponseEntity.ok("Solicitud actualizada correctamente");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno: " + e.getMessage());
+        }
+    }
+
+    // Obtener solicitudes por técnico
+    @GetMapping("/tecnico/{idEmpleado}")
+    @PreAuthorize("hasAuthority('TECNICO')")
+    public ResponseEntity<List<SolicitudRepuestoDTO>> obtenerSolicitudesPorTecnico(@PathVariable Integer idEmpleado) {
+        try {
+            // QUITAR LOGS DE DEBUG
+            List<SolicitudRepuesto> solicitudes = solicitudService.obtenerSolicitudesPorTecnico(idEmpleado);
+
+            // FILTRAR SOLO PENDIENTES
+            List<SolicitudRepuesto> solicitudesPendientes = solicitudes.stream()
+                    .filter(sol -> sol.getEstado() == EstadoSolicitudRepuesto.PENDIENTE)
+                    .collect(Collectors.toList());
+
+            List<SolicitudRepuestoDTO> resultado = solicitudesPendientes.stream().map(sol -> {
+                SolicitudRepuestoDTO dto = new SolicitudRepuestoDTO();
+                dto.setId(sol.getId());
+                dto.setIdIncidencia(sol.getIncidencia().getId());
+                dto.setEstado(sol.getEstado().toString());
+                dto.setFechaSolicitud(sol.getFechaSolicitud());
+
+                // Mapear detalles
+                List<DetalleRepuestoDTO> detalles = sol.getDetalles().stream().map(detalle -> {
+                    DetalleRepuestoDTO detalleDTO = new DetalleRepuestoDTO();
+                    detalleDTO.setIdRepuesto(detalle.getRepuesto().getId());
+                    detalleDTO.setCodigoRepuesto(detalle.getRepuesto().getCodigoRepuesto());
+                    detalleDTO.setNombreRepuesto(detalle.getRepuesto().getNombre());
+                    detalleDTO.setDescripcionRepuesto(detalle.getRepuesto().getDescripcion());
+                    detalleDTO.setCantidad(detalle.getCantidad());
+                    return detalleDTO;
+                }).collect(Collectors.toList());
+
+                dto.setDetalles(detalles);
+                return dto;
+            }).collect(Collectors.toList());
+
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
