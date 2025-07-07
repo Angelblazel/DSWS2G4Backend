@@ -37,6 +37,9 @@ public class SecurityConfig {
                                 
                                 // Auth: público
                                 .requestMatchers("/auth/**").permitAll()
+
+                                // Publico (aqui por necesidad de jerarquia)
+                                .requestMatchers(HttpMethod.GET, "/api/usuarios-solicitantes/buscar-por-correo").permitAll()
                                 
                                 // Jefe de Área
                                 .requestMatchers(HttpMethod.GET, "/api/v1/asignacion/tecnicos-disponibles").hasAuthority("JEFE_AREA")
@@ -46,13 +49,14 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/incidencias/*").hasAuthority("JEFE_AREA")
                                 .requestMatchers(HttpMethod.GET, "/api/v1/incidencias").hasAuthority("JEFE_AREA")
                                 .requestMatchers(HttpMethod.GET, "/api/v1/estadisticas/*").hasAuthority("JEFE_AREA")
-                                .requestMatchers("/api/usuarios-solicitantes/**").hasAuthority("JEFE_AREA")
+                                .requestMatchers("/api/usuarios-solicitantes/*").hasAuthority("JEFE_AREA")
                                 
                                 // Público (sin autenticación obligatoria)
                                 .requestMatchers(HttpMethod.GET, "/api/catalogos/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/incidencias/publica").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/incidencias/publica/*").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/incidencias/alerta").permitAll()
+
                                 
                                 // Técnico
                                 .requestMatchers("/api/historial/**").hasAuthority("TECNICO")

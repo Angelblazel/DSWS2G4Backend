@@ -3,12 +3,14 @@ package DSWS2Grupo4.controller;
 import DSWS2Grupo4.model.UsuarioSolicitante;
 import DSWS2Grupo4.service.UsuarioSolicitanteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuarios-solicitantes")
+@CrossOrigin(origins = "*")
 public class UsuarioSolicitanteController {
 
     @Autowired
@@ -22,6 +24,17 @@ public class UsuarioSolicitanteController {
     @GetMapping("/{id}")
     public UsuarioSolicitante obtenerPorId(@PathVariable Long id) {
         return usuarioSolicitanteService.obtenerPorId(id);
+    }
+
+    // Nuevo endpoint para buscar por correo
+    @GetMapping("/buscar-por-correo")
+    public ResponseEntity<UsuarioSolicitante> buscarPorCorreo(@RequestParam String correo) {
+        try {
+            UsuarioSolicitante usuario = usuarioSolicitanteService.buscarPorCorreo(correo);
+            return ResponseEntity.ok(usuario);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
