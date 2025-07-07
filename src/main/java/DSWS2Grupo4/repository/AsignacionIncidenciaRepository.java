@@ -1,5 +1,6 @@
 package DSWS2Grupo4.repository;
 
+import DSWS2Grupo4.DTO.ProblemasFrecuentesDTO;
 import DSWS2Grupo4.DTO.TicketsPorTecnicoDTO;
 import DSWS2Grupo4.model.AsignacionIncidencia;
 import DSWS2Grupo4.model.Incidencia;
@@ -15,11 +16,18 @@ public interface AsignacionIncidenciaRepository extends JpaRepository<Asignacion
     boolean existsByIncidenciaId(Long idIncidencia);
     Optional<AsignacionIncidencia> findByIncidencia(Incidencia incidencia);
 
-    @Query("SELECT new DSWS2Grupo4.DTO.TicketsPorTecnicoDTO(t.empleado.username, COUNT(a)) " +
+    @Query("SELECT new DSWS2Grupo4.DTO.TicketsPorTecnicoDTO(t.nombre, COUNT(a)) " +
        "FROM AsignacionIncidencia a " +
        "JOIN a.tecnico t " +
        "JOIN a.incidencia i " +
        "WHERE i.estado = 'solucionado' " +
-       "GROUP BY t.empleado.username")
+       "GROUP BY t.nombre")
     List<TicketsPorTecnicoDTO> contarTicketsAtendidosPorTecnico();
+
+    @Query("SELECT new DSWS2Grupo4.DTO.ProblemasFrecuentesDTO(p.descripcionProblema, COUNT(i)) " +
+       "FROM Incidencia i " +
+       "JOIN i.problemaSubcategoria p " +
+       "GROUP BY p.descripcionProblema " +
+       "ORDER BY COUNT(i) DESC")
+    List<ProblemasFrecuentesDTO> obtenerProblemasMasFrecuentes();
 }

@@ -1,5 +1,6 @@
 package DSWS2Grupo4.controller;
 
+import DSWS2Grupo4.DTO.ProblemasFrecuentesDTO;
 import DSWS2Grupo4.DTO.TicketsPorTecnicoDTO;
 import DSWS2Grupo4.service.EstadisticasService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/estadisticas")
-@CrossOrigin(origins = "*")
+// @CrossOrigin(origins = "*")
 public class EstadisticaController {
 
     @Autowired
@@ -25,10 +26,11 @@ public class EstadisticaController {
         return ResponseEntity.ok(datos);
     }
 
-    // @GetMapping("/tickets-tecnico/{id}")
-    // public ResponseEntity<List<TicketsPorTecnicoDTO>> ticketsPorTecnicoPorId(Integer id) {
-    //     List<TicketsPorTecnicoDTO> datos = estadisticasService.obtenerTicketsPorTecnicoPorId(id);
-    //     return ResponseEntity.ok(datos);
-    // }
+    @GetMapping("/problemas-frecuentes")
+    public ResponseEntity<List<ProblemasFrecuentesDTO>> getProblemasFrecuentes() {
+        List<ProblemasFrecuentesDTO> lista = estadisticasService.obtenerProblemasMasFrecuentes();
+        return ResponseEntity.ok(lista);
+    }
+
 }
 
