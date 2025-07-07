@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface TecnicoRepository extends JpaRepository<Tecnico, Long> {
 
     // Buscar todos los técnicos cuya carga actual sea menor a la carga máxima
-    @Query("SELECT t FROM Tecnico t WHERE t.cargaActual < t.cargaMaxima")
+    @Query("SELECT t FROM Tecnico t WHERE t.cargaActual < t.cargaMaxima ORDER BY t.id ASC")
     List<Tecnico> findTecnicosDisponibles();
     
     // Buscar técnico por ID de empleado

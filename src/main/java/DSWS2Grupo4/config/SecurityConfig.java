@@ -45,6 +45,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/incidencias/*").hasAuthority("JEFE_AREA")
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/incidencias/*").hasAuthority("JEFE_AREA")
                                 .requestMatchers(HttpMethod.GET, "/api/v1/incidencias").hasAuthority("JEFE_AREA")
+                                .requestMatchers(HttpMethod.GET, "/api/v1/estadisticas/*").hasAuthority("JEFE_AREA")
                                 .requestMatchers("/api/usuarios-solicitantes/**").hasAuthority("JEFE_AREA")
                                 
                                 // Público (sin autenticación obligatoria)

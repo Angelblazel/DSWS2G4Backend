@@ -31,6 +31,9 @@ public class Tecnico {
     @Column(name = "carga_actual", nullable = false)
     private int cargaActual = 0;
 
+    @Column(name = "nombre", nullable = false)
+    private String nombre;
+
 }
 
 
