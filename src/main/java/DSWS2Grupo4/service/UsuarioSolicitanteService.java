@@ -24,6 +24,12 @@ public class UsuarioSolicitanteService {
                 .orElseThrow(() -> new RuntimeException("UsuarioSolicitante no encontrado con ID: " + id));
     }
 
+    // Nuevo método para buscar por correo
+    public UsuarioSolicitante buscarPorCorreo(String correo) {
+        return usuarioSolicitanteRepo.findByCorreoNumero(correo)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con correo: " + correo));
+    }
+
     // Crear nuevo
     public UsuarioSolicitante crear(UsuarioSolicitante usuarioSolicitante) {
         return usuarioSolicitanteRepo.save(usuarioSolicitante);
@@ -31,18 +37,15 @@ public class UsuarioSolicitanteService {
 
     // Actualizar
     public UsuarioSolicitante actualizar(Long id, UsuarioSolicitante nuevoUsuario) {
-        UsuarioSolicitante existente = obtenerPorId(id);
-        existente.setCorreoNumero(nuevoUsuario.getCorreoNumero());
-        existente.setPrioridadUsuario(nuevoUsuario.getPrioridadUsuario());
-        existente.setEquipo(nuevoUsuario.getEquipo());
-        return usuarioSolicitanteRepo.save(existente);
+        UsuarioSolicitante usuarioExistente = obtenerPorId(id);
+        usuarioExistente.setCorreoNumero(nuevoUsuario.getCorreoNumero());
+        usuarioExistente.setPrioridadUsuario(nuevoUsuario.getPrioridadUsuario());
+        usuarioExistente.setEquipo(nuevoUsuario.getEquipo());
+        return usuarioSolicitanteRepo.save(usuarioExistente);
     }
 
     // Eliminar
     public void eliminar(Long id) {
-        if (!usuarioSolicitanteRepo.existsById(id)) {
-            throw new RuntimeException("UsuarioSolicitante no encontrado con ID: " + id);
-        }
         usuarioSolicitanteRepo.deleteById(id);
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/usuarios-solicitantes")
+@RequestMapping("/api/v1/usuarios-solicitantes")
 @CrossOrigin(origins = "*")
 public class UsuarioSolicitanteController {
 
@@ -24,6 +24,17 @@ public class UsuarioSolicitanteController {
     @GetMapping("/{id}")
     public UsuarioSolicitante obtenerPorId(@PathVariable Long id) {
         return usuarioSolicitanteService.obtenerPorId(id);
+    }
+
+    // Nuevo endpoint para buscar por correo
+    @GetMapping("/buscar-por-correo")
+    public ResponseEntity<UsuarioSolicitante> buscarPorCorreo(@RequestParam String correo) {
+        try {
+            UsuarioSolicitante usuario = usuarioSolicitanteService.buscarPorCorreo(correo);
+            return ResponseEntity.ok(usuario);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
