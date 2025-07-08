@@ -38,46 +38,38 @@ public class SecurityConfig {
                                 // Auth: público
                                 .requestMatchers("/auth/**").permitAll()
 
-                                // Publico (aqui por necesidad de jerarquia)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/usuarios-solicitantes/buscar-por-correo").permitAll()
+                                // Público (sin autenticación obligatoria) - SIN /api/v1 porque ya está en context-path
+                                .requestMatchers(HttpMethod.GET, "/catalogos/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/incidencias/publica").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/incidencias/publica/*").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/incidencias/alerta").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/usuarios-solicitantes/buscar-por-correo").permitAll()
                                 
                                 // Jefe de Área
-                                .requestMatchers(HttpMethod.GET, "/api/v1/asignacion/tecnicos-disponibles").hasAuthority("JEFE_AREA")
-                                .requestMatchers(HttpMethod.POST, "/api/v1/asignacion").hasAuthority("JEFE_AREA")
-                                .requestMatchers(HttpMethod.GET, "/api/v1/asignacion/no-asignadas").hasAuthority("JEFE_AREA")
-                                .requestMatchers(HttpMethod.PUT, "/api/v1/incidencias/*").hasAuthority("JEFE_AREA")
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/incidencias/*").hasAuthority("JEFE_AREA")
-                                .requestMatchers(HttpMethod.GET, "/api/v1/incidencias").hasAuthority("JEFE_AREA")
+                                .requestMatchers(HttpMethod.GET, "/asignacion/tecnicos-disponibles").hasAuthority("JEFE_AREA")
+                                .requestMatchers(HttpMethod.POST, "/asignacion").hasAuthority("JEFE_AREA")
+                                .requestMatchers(HttpMethod.GET, "/asignacion/no-asignadas").hasAuthority("JEFE_AREA")
+                                .requestMatchers(HttpMethod.PUT, "/incidencias/*").hasAuthority("JEFE_AREA")
+                                .requestMatchers(HttpMethod.DELETE, "/incidencias/*").hasAuthority("JEFE_AREA")
+                                .requestMatchers(HttpMethod.GET, "/incidencias").hasAuthority("JEFE_AREA")
                                 .requestMatchers(HttpMethod.GET, "/estadisticas/*").hasAuthority("JEFE_AREA")
-                                .requestMatchers("/api/v1/usuarios-solicitantes/*").hasAuthority("JEFE_AREA")
-                                
-                                // Público (sin autenticación obligatoria)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/catalogos/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/incidencias/publica").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/incidencias/publica/*").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/incidencias/alerta").permitAll()
-
+                                .requestMatchers("/usuarios-solicitantes/**").hasAuthority("JEFE_AREA")
                                 
                                 // Técnico
-                                .requestMatchers("/api/v1/historial/**").hasAuthority("TECNICO")
-                                .requestMatchers("/api/v1/incidencias/*/soluciones").hasAuthority("TECNICO")
-                                .requestMatchers("/api/v1/tecnico/incidencias/**").hasAuthority("TECNICO")
-                                .requestMatchers("/api/v1/incidencias/solucion").hasAuthority("TECNICO")
-                                
+                                .requestMatchers("/historial/**").hasAuthority("TECNICO")
+                                .requestMatchers("/incidencias/*/soluciones").hasAuthority("TECNICO")
+                                .requestMatchers("/tecnico/incidencias/**").hasAuthority("TECNICO")
+                                .requestMatchers("/incidencias/solucion").hasAuthority("TECNICO")
                                 
                                 // Técnico y Logística
-                                .requestMatchers("/api/v1/solicitudes-repuestos/repuestos").hasAnyAuthority("TECNICO", "LOGISTICA")
-                                .requestMatchers("/api/v1/solicitudes-repuestos").hasAnyAuthority("TECNICO", "LOGISTICA")
+                                .requestMatchers("/solicitudes-repuestos/repuestos").hasAnyAuthority("TECNICO", "LOGISTICA")
+                                .requestMatchers("/solicitudes-repuestos").hasAnyAuthority("TECNICO", "LOGISTICA")
                                 
                                 // Logística
-                                .requestMatchers(HttpMethod.PUT, "/api/v1/solicitudes-repuestos/*").hasAuthority("LOGISTICA")
-                                .requestMatchers("/api/v1/repuesto/**").hasAuthority("LOGISTICA")
-                                .requestMatchers("/api/v1/repuesto").hasAuthority("LOGISTICA")
+                                .requestMatchers(HttpMethod.PUT, "/solicitudes-repuestos/*").hasAuthority("LOGISTICA")
+                                .requestMatchers("/repuesto/**").hasAuthority("LOGISTICA")
+                                .requestMatchers("/repuesto").hasAuthority("LOGISTICA")
       
-                                /*.requestMatchers("/api/v1/tecnico/**").hasAuthority("TECNICO")
-                                .requestMatchers("/api/v1/repuesto/**").hasAuthority("LOGISTICA")
-                                .requestMatchers(HttpMethod.GET).permitAll()
-                                .requestMatchers(HttpMethod.POST).permitAll()*/
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager->

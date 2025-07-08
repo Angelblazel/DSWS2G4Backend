@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/usuarios-solicitantes")
+@RequestMapping("/usuarios-solicitantes")
 @CrossOrigin(origins = "*")
 public class UsuarioSolicitanteController {
 
@@ -22,11 +22,16 @@ public class UsuarioSolicitanteController {
     }
 
     @GetMapping("/{id}")
-    public UsuarioSolicitante obtenerPorId(@PathVariable Long id) {
-        return usuarioSolicitanteService.obtenerPorId(id);
+    public ResponseEntity<UsuarioSolicitante> obtenerPorId(@PathVariable Long id) {
+        try {
+            UsuarioSolicitante usuario = usuarioSolicitanteService.obtenerPorId(id);
+            return ResponseEntity.ok(usuario);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    // Nuevo endpoint para buscar por correo
+    // Endpoint para buscar por correo (público)
     @GetMapping("/buscar-por-correo")
     public ResponseEntity<UsuarioSolicitante> buscarPorCorreo(@RequestParam String correo) {
         try {
@@ -38,17 +43,34 @@ public class UsuarioSolicitanteController {
     }
 
     @PostMapping
-    public UsuarioSolicitante crear(@RequestBody UsuarioSolicitante usuario) {
-        return usuarioSolicitanteService.crear(usuario);
+    public ResponseEntity<UsuarioSolicitante> crear(@RequestBody UsuarioSolicitante usuario) {
+        try {
+            UsuarioSolicitante usuarioCreado = usuarioSolicitanteService.crear(usuario);
+            return ResponseEntity.ok(usuarioCreado);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public UsuarioSolicitante actualizar(@PathVariable Long id, @RequestBody UsuarioSolicitante usuarioActualizado) {
-        return usuarioSolicitanteService.actualizar(id, usuarioActualizado);
+    public ResponseEntity<UsuarioSolicitante> actualizar(@PathVariable Long id, @RequestBody UsuarioSolicitante usuarioActualizado) {
+        try {
+            UsuarioSolicitante usuario = usuarioSolicitanteService.actualizar(id, usuarioActualizado);
+            return ResponseEntity.ok(usuario);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        usuarioSolicitanteService.eliminar(id);
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        try {
+            usuarioSolicitanteService.eliminar(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
