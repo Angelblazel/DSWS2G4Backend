@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/solicitudes-repuestos")
+@RequestMapping("/api/v1/solicitudes-repuestos")
 @CrossOrigin(origins = "*")
 public class SolicitudRepuestoController {
 
