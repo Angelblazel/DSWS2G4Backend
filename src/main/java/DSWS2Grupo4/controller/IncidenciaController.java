@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/incidencias")
+@RequestMapping("/incidencias")
 @CrossOrigin(origins = "*")  // Para facilitar las pruebas
 public class IncidenciaController {
 

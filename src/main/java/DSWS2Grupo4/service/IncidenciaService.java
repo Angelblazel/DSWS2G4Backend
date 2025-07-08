@@ -18,7 +18,6 @@ public class IncidenciaService {
 
     @Autowired private IncidenciaRepository incidenciaRepo;
     @Autowired private UsuarioSolicitanteRepository usuarioRepo;
-    @Autowired private EquipoRepository equipoRepo;
     @Autowired private ProblemaSubcategoriaRepository problemaRepo;
     @Autowired private AsignacionIncidenciaRepository asignacionRepo;
     @Autowired private HistorialEquipoRepository historialEquipoRepo;
