@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
-@RequestMapping("/historial")
+@RequestMapping("/api/historial")
 @CrossOrigin(origins = "*") // O especifica tu frontend si gustas
 public class HistorialEquipoController {
 

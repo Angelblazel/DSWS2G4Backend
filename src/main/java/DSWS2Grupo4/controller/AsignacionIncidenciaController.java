@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/asignacion")
+@RequestMapping("/api/v1/asignacion")
 public class AsignacionIncidenciaController {
 
     @Autowired

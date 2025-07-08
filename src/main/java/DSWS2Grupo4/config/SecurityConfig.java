@@ -34,13 +34,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                                
+
                                 // Auth: público
                                 .requestMatchers("/auth/**").permitAll()
 
-                                // Publico (aqui por necesidad de jerarquia)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/usuarios-solicitantes/buscar-por-correo").permitAll()
-                                
                                 // Jefe de Área
                                 .requestMatchers(HttpMethod.GET, "/api/v1/asignacion/tecnicos-disponibles").hasAuthority("JEFE_AREA")
                                 .requestMatchers(HttpMethod.POST, "/api/v1/asignacion").hasAuthority("JEFE_AREA")
@@ -48,32 +45,31 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/incidencias/*").hasAuthority("JEFE_AREA")
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/incidencias/*").hasAuthority("JEFE_AREA")
                                 .requestMatchers(HttpMethod.GET, "/api/v1/incidencias").hasAuthority("JEFE_AREA")
-                                .requestMatchers(HttpMethod.GET, "/estadisticas/*").hasAuthority("JEFE_AREA")
-                                .requestMatchers("/api/v1/usuarios-solicitantes/*").hasAuthority("JEFE_AREA")
-                                
+                                .requestMatchers(HttpMethod.GET, "/api/v1/estadisticas/*").hasAuthority("JEFE_AREA")
+                                .requestMatchers("/api/usuarios-solicitantes/**").hasAuthority("JEFE_AREA")
+
                                 // Público (sin autenticación obligatoria)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/catalogos/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/catalogos/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/incidencias/publica").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/incidencias/publica/*").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/incidencias/alerta").permitAll()
 
-                                
                                 // Técnico
-                                .requestMatchers("/api/v1/historial/**").hasAuthority("TECNICO")
+                                .requestMatchers("/api/historial/**").hasAuthority("TECNICO")
                                 .requestMatchers("/api/v1/incidencias/*/soluciones").hasAuthority("TECNICO")
                                 .requestMatchers("/api/v1/tecnico/incidencias/**").hasAuthority("TECNICO")
                                 .requestMatchers("/api/v1/incidencias/solucion").hasAuthority("TECNICO")
-                                
-                                
+
+
                                 // Técnico y Logística
                                 .requestMatchers("/api/v1/solicitudes-repuestos/repuestos").hasAnyAuthority("TECNICO", "LOGISTICA")
                                 .requestMatchers("/api/v1/solicitudes-repuestos").hasAnyAuthority("TECNICO", "LOGISTICA")
-                                
+
                                 // Logística
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/solicitudes-repuestos/*").hasAuthority("LOGISTICA")
                                 .requestMatchers("/api/v1/repuesto/**").hasAuthority("LOGISTICA")
                                 .requestMatchers("/api/v1/repuesto").hasAuthority("LOGISTICA")
-      
+
                                 /*.requestMatchers("/api/v1/tecnico/**").hasAuthority("TECNICO")
                                 .requestMatchers("/api/v1/repuesto/**").hasAuthority("LOGISTICA")
                                 .requestMatchers(HttpMethod.GET).permitAll()
