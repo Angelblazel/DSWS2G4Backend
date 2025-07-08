@@ -21,7 +21,7 @@ public class UsuarioSolicitanteService {
     // Buscar por ID
     public UsuarioSolicitante obtenerPorId(Long id) {
         return usuarioSolicitanteRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("UsuarioSolicitante no encontrado con ID: " + id));
+                .orElseThrow(() -> new RuntimeException("UsuarioSolicitante no encontrado con ID: " + id));
     }
 
     // Crear nuevo

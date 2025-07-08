@@ -188,7 +188,7 @@ public class IncidenciaService {
             return dto;
         }).collect(Collectors.toList());
     }
-    
+
     // Obtener todas las soluciones para el problema de una incidencia dada
     public List<SolucionSubcategoria> obtenerSolucionesPorIncidencia(Long idIncidencia) {
         Incidencia incidencia = incidenciaRepo.findById(idIncidencia)
@@ -198,7 +198,7 @@ public class IncidenciaService {
 
         return solucionRepo.findByProblema_Id(idProblema);
     }
-    
+
     // Guardar o actualizar la solución para una incidencia con palabras clave y fecha automática
     public HistorialEquipo registrarSolucion(SolucionRequest request) {
         // Buscar la incidencia

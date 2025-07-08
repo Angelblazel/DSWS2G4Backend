@@ -3,12 +3,14 @@ package DSWS2Grupo4.controller;
 import DSWS2Grupo4.model.UsuarioSolicitante;
 import DSWS2Grupo4.service.UsuarioSolicitanteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuarios-solicitantes")
+@CrossOrigin(origins = "*")
 public class UsuarioSolicitanteController {
 
     @Autowired
