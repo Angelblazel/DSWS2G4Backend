@@ -7,7 +7,6 @@ import java.util.List;
 @Data
 public class SolicitudRepuestoDTO {
     private Long id;
-    private Long idSolicitud;
     private String estado;
     private LocalDateTime fechaSolicitud;
     private String nombreTecnico;

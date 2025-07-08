@@ -1,7 +1,6 @@
 package DSWS2Grupo4.controller;
 
 import DSWS2Grupo4.model.Repuesto;
-import DSWS2Grupo4.repository.RepuestoRepository;
 import DSWS2Grupo4.service.RepuestoService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/repuesto")
+@RequestMapping("/repuesto")
 public class RepuestoController {
 
     @Autowired
     private RepuestoService repuestoService;
-    @Autowired
-    private RepuestoRepository repuestoRepository;
 
     @GetMapping
     public ResponseEntity<List<Repuesto>> listar(){
