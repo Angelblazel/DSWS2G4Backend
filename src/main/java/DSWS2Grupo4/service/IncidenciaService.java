@@ -45,6 +45,7 @@ public class IncidenciaService {
         inc.setProblemaSubcategoria(problemaSubcategoria);
         inc.setEstado(EstadoIncidencia.pendiente);
         inc.setUbicacionAtencion(UbicacionAtencion.remoto);
+        inc.setFecha(LocalDateTime.now());
         inc = incidenciaRepo.save(inc);
 
         Integer prioridadFinal = calcularPrioridadFinal(
@@ -59,15 +60,10 @@ public class IncidenciaService {
         );
     }
 
-    private Integer calcularPrioridadPorCorreo(String correo) {
-        if (correo.endsWith("@gerente.com")) return 5;
-        if (correo.endsWith("@subgerente.com")) return 3;
-        if (correo.endsWith("@empleado.com")) return 1;
-        return 1;
-    }
-
     private Integer calcularPrioridadFinal(Integer prioridadUsuario, Integer prioridadProblema) {
-        return (prioridadUsuario + prioridadProblema) / 2;
+        int priorUser = prioridadUsuario != null ? prioridadUsuario : 1;
+        int priorProb = prioridadProblema != null ? prioridadProblema : 1;
+        return (priorUser + priorProb) / 2;
     }
 
     public List<IncidenciaTecnicoDTO> listarIncidenciasTecnico(Integer tecnicoId, String numeroTicket) {
@@ -90,6 +86,7 @@ public class IncidenciaService {
 
         int prioridadTotal = (prioridadProblema != null ? prioridadProblema : 0) +
                 (prioridadUsuario != null ? prioridadUsuario : 0);
+        
         return new IncidenciaTecnicoDTO(
                 incidencia.getId(),
                 usuario.getCorreoNumero(),
@@ -97,46 +94,40 @@ public class IncidenciaService {
                 incidencia.getFecha(),
                 incidencia.getProblemaSubcategoria().getDescripcionProblema(),
                 incidencia.getEstado(),
-                prioridadTotal  // Prioridad csumada
+                prioridadTotal
         );
     }
+
     public List<Incidencia> listarIncidencias() {
         return incidenciaRepo.findAll();
     }
 
-    // Obtener por ID
     public Incidencia obtenerPorId(Long id) {
         return incidenciaRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Incidencia no encontrada con ID: " + id));
     }
 
-    // Registrar incidencia desde request
     public Incidencia registrarIncidencia(IncidenciaRequest req) {
         IncidenciaResponse response = registrarIncidenciaPublica(req);
         return incidenciaRepo.findById(response.getIdIncidencia())
                 .orElseThrow(() -> new EntityNotFoundException("No se pudo encontrar la incidencia recién creada"));
     }
 
-    // Guardar incidencia
     public Incidencia guardarIncidencia(Incidencia incidencia) {
         return incidenciaRepo.save(incidencia);
     }
 
-    // Actualizar incidencia
     public Incidencia actualizarIncidencia(Long id, Incidencia incidencia) {
         if (!incidenciaRepo.existsById(id)) {
             throw new EntityNotFoundException("Incidencia no encontrada con ID: " + id);
         }
 
         incidencia.setId(id);
-
-        // Establecer la fecha actual al momento de actualizar
         incidencia.setFecha(LocalDateTime.now());
 
         return incidenciaRepo.save(incidencia);
     }
 
-    // Eliminar incidencia
     public boolean eliminarIncidencia(Long id) {
         if (incidenciaRepo.existsById(id)) {
             incidenciaRepo.deleteById(id);
@@ -145,7 +136,6 @@ public class IncidenciaService {
         return false;
     }
 
-    //Consultar Estado Incidencia
     public List<SeguimientoIncidenciaDTO> listarSeguimientoPorCorreo(String correo) {
         List<Incidencia> incidencias = incidenciaRepo.findByUsuarioSolicitante_CorreoNumero(correo);
 
@@ -157,12 +147,12 @@ public class IncidenciaService {
             dto.setFechaRegistro(incidencia.getFecha().toString());
             dto.setProblema(incidencia.getProblemaSubcategoria().getDescripcionProblema());
 
-            // técnico asignado (si existe)
+            // Técnico asignado (si existe)
             asignacionRepo.findByIncidencia(incidencia).ifPresent(asig ->
                     dto.setTecnicoAsignado(asig.getTecnico().getEmpleado().getUsername())
             );
 
-            // historial de solución (si existe)
+            // Historial de solución (si existe)
             if (incidencia.getHistorialEquipo() != null) {
                 dto.setHistorialSolucion(incidencia.getHistorialEquipo().getSolucion().getSolucionProblema());
             }
@@ -171,7 +161,6 @@ public class IncidenciaService {
         }).collect(Collectors.toList());
     }
 
-    // Obtener todas las soluciones para el problema de una incidencia dada
     public List<SolucionSubcategoria> obtenerSolucionesPorIncidencia(Long idIncidencia) {
         Incidencia incidencia = incidenciaRepo.findById(idIncidencia)
                 .orElseThrow(() -> new EntityNotFoundException("Incidencia no encontrada"));
@@ -181,7 +170,6 @@ public class IncidenciaService {
         return solucionRepo.findByProblema_Id(idProblema);
     }
 
-    // Guardar o actualizar la solución para una incidencia con palabras clave y fecha automática
     public HistorialEquipo registrarSolucion(SolucionRequest request) {
         // Buscar la incidencia
         Incidencia incidencia = incidenciaRepo.findById(request.getIdIncidencia())
@@ -224,7 +212,6 @@ public class IncidenciaService {
         return historialEquipoRepo.save(historial);
     }
 
-    // Métodos para reporte de incidencias por fechas
     public List<ReporteIncidenciaDTO> generarReporteIncidencias(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
         List<Incidencia> incidencias;
 
@@ -243,7 +230,6 @@ public class IncidenciaService {
                 .collect(Collectors.toList());
     }
 
-    // Método para que el usuario solicitante edite su incidencia
     public Incidencia editarIncidenciaPorSolicitante(Long idIncidencia, String correoSolicitante, IncidenciaRequest nuevosdatos) {
         Incidencia incidencia = incidenciaRepo.findById(idIncidencia)
                 .orElseThrow(() -> new EntityNotFoundException("Incidencia no encontrada"));

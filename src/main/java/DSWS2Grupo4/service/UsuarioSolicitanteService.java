@@ -32,20 +32,41 @@ public class UsuarioSolicitanteService {
 
     // Crear nuevo
     public UsuarioSolicitante crear(UsuarioSolicitante usuarioSolicitante) {
+        if (usuarioSolicitante.getCorreoNumero() == null || usuarioSolicitante.getCorreoNumero().trim().isEmpty()) {
+            throw new IllegalArgumentException("El correo es obligatorio");
+        }
+
+        if (usuarioSolicitante.getEquipo() == null) {
+            throw new IllegalArgumentException("El equipo es obligatorio");
+        }
+
         return usuarioSolicitanteRepo.save(usuarioSolicitante);
     }
 
     // Actualizar
     public UsuarioSolicitante actualizar(Long id, UsuarioSolicitante nuevoUsuario) {
         UsuarioSolicitante usuarioExistente = obtenerPorId(id);
-        usuarioExistente.setCorreoNumero(nuevoUsuario.getCorreoNumero());
-        usuarioExistente.setPrioridadUsuario(nuevoUsuario.getPrioridadUsuario());
-        usuarioExistente.setEquipo(nuevoUsuario.getEquipo());
+
+        if (nuevoUsuario.getCorreoNumero() != null) {
+            usuarioExistente.setCorreoNumero(nuevoUsuario.getCorreoNumero());
+        }
+
+        if (nuevoUsuario.getPrioridadUsuario() != null) {
+            usuarioExistente.setPrioridadUsuario(nuevoUsuario.getPrioridadUsuario());
+        }
+
+        if (nuevoUsuario.getEquipo() != null) {
+            usuarioExistente.setEquipo(nuevoUsuario.getEquipo());
+        }
+
         return usuarioSolicitanteRepo.save(usuarioExistente);
     }
 
     // Eliminar
     public void eliminar(Long id) {
+        if (!usuarioSolicitanteRepo.existsById(id)) {
+            throw new RuntimeException("UsuarioSolicitante no encontrado con ID: " + id);
+        }
         usuarioSolicitanteRepo.deleteById(id);
     }
 }
