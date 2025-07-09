@@ -43,14 +43,16 @@ public class UsuarioSolicitanteController {
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioSolicitante> crear(@RequestBody UsuarioSolicitante usuario) {
+    public ResponseEntity<?> crear(@RequestBody UsuarioSolicitante usuario) {
         try {
             UsuarioSolicitante usuarioCreado = usuarioSolicitanteService.crear(usuario);
             return ResponseEntity.ok(usuarioCreado);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            e.printStackTrace(); // también verás el error en consola
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioSolicitante> actualizar(@PathVariable Long id, @RequestBody UsuarioSolicitante usuarioActualizado) {

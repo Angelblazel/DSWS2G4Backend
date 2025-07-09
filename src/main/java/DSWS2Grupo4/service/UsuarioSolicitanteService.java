@@ -1,6 +1,10 @@
 package DSWS2Grupo4.service;
 
+import DSWS2Grupo4.model.DatosEmpleado;
+import DSWS2Grupo4.model.Equipo;
 import DSWS2Grupo4.model.UsuarioSolicitante;
+import DSWS2Grupo4.repository.DatosEmpleadoRepository;
+import DSWS2Grupo4.repository.EquipoRepository;
 import DSWS2Grupo4.repository.UsuarioSolicitanteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +16,11 @@ public class UsuarioSolicitanteService {
 
     @Autowired
     private UsuarioSolicitanteRepository usuarioSolicitanteRepo;
+    @Autowired
+    private EquipoRepository equipoRepository;
+    @Autowired
+    private DatosEmpleadoRepository datosEmpleadoRepo;
+
 
     // Listar todos
     public List<UsuarioSolicitante> listarTodos() {
@@ -30,33 +39,54 @@ public class UsuarioSolicitanteService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con correo: " + correo));
     }
 
-    // Crear nuevo
+    // Crear nuevo con equipo asignado automáticamente
     public UsuarioSolicitante crear(UsuarioSolicitante usuarioSolicitante) {
         if (usuarioSolicitante.getCorreoNumero() == null || usuarioSolicitante.getCorreoNumero().trim().isEmpty()) {
             throw new IllegalArgumentException("El correo es obligatorio");
         }
 
-        if (usuarioSolicitante.getEquipo() == null) {
-            throw new IllegalArgumentException("El equipo es obligatorio");
+        if (usuarioSolicitante.getDatosEmpleado() == null) {
+            throw new IllegalArgumentException("Los datos del empleado son obligatorios");
         }
 
+        // 1. Guardar primero los datos del empleado
+        DatosEmpleado datosGuardado = datosEmpleadoRepo.save(usuarioSolicitante.getDatosEmpleado());
+
+        // 2. Buscar equipo libre
+        Equipo equipoLibre = equipoRepository.findEquipoNoAsignado()
+                .orElseThrow(() -> new RuntimeException("No hay equipos disponibles"));
+
+        // 3. Asignar ambos
+        usuarioSolicitante.setDatosEmpleado(datosGuardado);
+        usuarioSolicitante.setEquipo(equipoLibre);
+
+        // 4. Guardar usuario
         return usuarioSolicitanteRepo.save(usuarioSolicitante);
     }
 
-    // Actualizar
     public UsuarioSolicitante actualizar(Long id, UsuarioSolicitante nuevoUsuario) {
         UsuarioSolicitante usuarioExistente = obtenerPorId(id);
 
-        if (nuevoUsuario.getCorreoNumero() != null) {
+        // Actualizar correo si se proporciona
+        if (nuevoUsuario.getCorreoNumero() != null && !nuevoUsuario.getCorreoNumero().isBlank()) {
             usuarioExistente.setCorreoNumero(nuevoUsuario.getCorreoNumero());
         }
 
-        if (nuevoUsuario.getPrioridadUsuario() != null) {
-            usuarioExistente.setPrioridadUsuario(nuevoUsuario.getPrioridadUsuario());
-        }
+        // Actualizar datos del empleado
+        if (nuevoUsuario.getDatosEmpleado() != null) {
+            DatosEmpleado nuevosDatos = nuevoUsuario.getDatosEmpleado();
+            DatosEmpleado datosActuales = usuarioExistente.getDatosEmpleado();
 
-        if (nuevoUsuario.getEquipo() != null) {
-            usuarioExistente.setEquipo(nuevoUsuario.getEquipo());
+            if (datosActuales == null) {
+                DatosEmpleado nuevosGuardado = datosEmpleadoRepo.save(nuevosDatos);
+                usuarioExistente.setDatosEmpleado(nuevosGuardado);
+            } else {
+                if (nuevosDatos.getNombre() != null) datosActuales.setNombre(nuevosDatos.getNombre());
+                if (nuevosDatos.getApellido() != null) datosActuales.setApellido(nuevosDatos.getApellido());
+                if (nuevosDatos.getDni() != null) datosActuales.setDni(nuevosDatos.getDni());
+                if (nuevosDatos.getCelular() != null) datosActuales.setCelular(nuevosDatos.getCelular());
+                datosEmpleadoRepo.save(datosActuales);
+            }
         }
 
         return usuarioSolicitanteRepo.save(usuarioExistente);

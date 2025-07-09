@@ -18,10 +18,11 @@ public class UsuarioSolicitante {
     @Column(name = "correo", nullable = false)
     private String correoNumero;
 
-    @Column(name = "prioridad_usuario")
-    private Integer prioridadUsuario;
-
     @ManyToOne
     @JoinColumn(name = "id_equipo", nullable = false)
     private Equipo equipo;
+    
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_datos_empleados", nullable = false)
+    private DatosEmpleado datosEmpleado;
 }

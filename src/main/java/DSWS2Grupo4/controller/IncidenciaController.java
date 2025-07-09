@@ -142,7 +142,6 @@ public class IncidenciaController {
             response.setSubCategoria(inc.getProblemaSubcategoria().getSubcategoria().getNombreSubcategoria());
             response.setDescripcionProblema(inc.getProblemaSubcategoria().getDescripcionProblema());
             
-            response.setPrioridad(String.valueOf(inc.getUsuarioSolicitante().getPrioridadUsuario()));
             response.setCodigoEquipo(inc.getUsuarioSolicitante().getEquipo().getCodigoEquipo());
             
             return ResponseEntity.ok(response);

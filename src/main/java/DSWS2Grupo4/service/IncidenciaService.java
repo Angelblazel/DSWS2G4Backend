@@ -49,7 +49,7 @@ public class IncidenciaService {
         inc = incidenciaRepo.save(inc);
 
         Integer prioridadFinal = calcularPrioridadFinal(
-                usuario.getPrioridadUsuario(),
+                0,
                 problemaSubcategoria.getPrioridadProblema()
         );
 
@@ -82,10 +82,8 @@ public class IncidenciaService {
     private IncidenciaTecnicoDTO convertToTecnicoDTO(Incidencia incidencia) {
         UsuarioSolicitante usuario = incidencia.getUsuarioSolicitante();
         Integer prioridadProblema = incidencia.getProblemaSubcategoria().getPrioridadProblema();
-        Integer prioridadUsuario = usuario.getPrioridadUsuario();
 
-        int prioridadTotal = (prioridadProblema != null ? prioridadProblema : 0) +
-                (prioridadUsuario != null ? prioridadUsuario : 0);
+        int prioridadTotal = (prioridadProblema != null ? prioridadProblema : 0);
         
         return new IncidenciaTecnicoDTO(
                 incidencia.getId(),
@@ -266,9 +264,6 @@ public class IncidenciaService {
         }
 
         Integer prioridad = 0;
-        if (incidencia.getUsuarioSolicitante().getPrioridadUsuario() != null) {
-            prioridad += incidencia.getUsuarioSolicitante().getPrioridadUsuario();
-        }
         if (incidencia.getProblemaSubcategoria().getPrioridadProblema() != null) {
             prioridad += incidencia.getProblemaSubcategoria().getPrioridadProblema();
         }
