@@ -1,5 +1,6 @@
 package DSWS2Grupo4.controller;
 
+import DSWS2Grupo4.dto.UsuarioEquipoResponse;
 import DSWS2Grupo4.model.UsuarioSolicitante;
 import DSWS2Grupo4.service.UsuarioSolicitanteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +34,25 @@ public class UsuarioSolicitanteController {
 
     // Endpoint para buscar por correo (público)
     @GetMapping("/buscar-por-correo")
-    public ResponseEntity<UsuarioSolicitante> buscarPorCorreo(@RequestParam String correo) {
+    public ResponseEntity<?> buscarPorCorreo(@RequestParam String correo) {
         try {
             UsuarioSolicitante usuario = usuarioSolicitanteService.buscarPorCorreo(correo);
-            return ResponseEntity.ok(usuario);
+
+            if (usuario.getEquipo() == null) {
+                return ResponseEntity.badRequest().body("El usuario no tiene un equipo asignado.");
+            }
+
+            UsuarioEquipoResponse response = new UsuarioEquipoResponse(
+                    usuario.getCorreoNumero(),
+                    usuario.getEquipo().getCodigoEquipo()
+            );
+
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody UsuarioSolicitante usuario) {

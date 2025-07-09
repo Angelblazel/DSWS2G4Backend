@@ -24,6 +24,11 @@ public class Tecnico {
     @OneToOne
     @JoinColumn(name = "id_empleado", nullable = false)
     private Usuario empleado;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false)
+    private EstadoTecnico estado = EstadoTecnico.LIBRE;
+
 
     @Column(name = "carga_maxima", nullable = false)
     private int cargaMaxima = 6;
